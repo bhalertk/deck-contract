@@ -1,7 +1,7 @@
 # Eric Presentation Design System v1.2
 
-狀態：Canonical（權威版本）
-語言：zh-Hant 優先，支援雙語編輯
+狀態：Canonical（權威版本）  
+語言：zh-Hant 優先，支援雙語編輯  
 參考實作：`AI_Playbook_DesignSystem_v1.1.html`
 
 ---
@@ -58,13 +58,13 @@ forbidden_patterns: []
 
 ## 1.2 Contract Gate（合約關卡）
 
-**RULE**
+**RULE**  
 進入構圖前，Contract 必須完整。
 
-**WHEN**
+**WHEN**  
 所有生成的簡報。
 
-**CHECK**
+**CHECK**  
 若缺少下列任一項，須在版面生成前 STOP（停止）：
 
 - audience
@@ -74,7 +74,7 @@ forbidden_patterns: []
 - slide_count_max
 - technical_depth
 
-**SEVERITY**
+**SEVERITY**  
 ERROR
 
 ---
@@ -114,48 +114,48 @@ Canon 規則不可協商，除非 Contract 明確覆蓋。
 
 ## C01 — 一頁一個概念（One Slide, One Idea）
 
-**RULE**
+**RULE**  
 每一頁投影片只傳達一個核心概念。
 
-**WHEN**
+**WHEN**  
 所有非附錄（non-appendix）投影片。
 
-**CHECK**
+**CHECK**  
 若該頁需要用「和」「也」等連接詞串起兩個獨立的結論句，或存在各自獨立的結論，則應拆分。
 
-**SEVERITY**
+**SEVERITY**  
 ERROR
 
 ---
 
 ## C02 — 唯一主要視覺焦點（One Primary Visual Anchor）
 
-**RULE**
+**RULE**  
 每一頁投影片恰好有一個主要視覺焦點。
 
-**WHEN**
+**WHEN**  
 所有非附錄投影片。
 
-**CHECK**
-視覺 QA 必須辨識出「眼睛最先看到什麼」。
+**CHECK**  
+視覺 QA 必須辨識出「眼睛最先看到什麼」。  
 若有兩個以上元素的視覺權重大致相當，標記：
 
 `S15_MULTIPLE_ANCHOR`
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C03 — BODY 最小字級
 
-**RULE**
+**RULE**  
 BODY（內文）文字不得小於 15 pt 等效字級。
 
-**WHEN**
+**WHEN**  
 簡報模式（presentation-mode）投影片。
 
-**CHECK**
+**CHECK**  
 - PPTX：BODY < 15 pt → 不合格
 - HTML：BODY 低於對應等效值 → 不合格
 
@@ -165,14 +165,14 @@ BODY（內文）文字不得小於 15 pt 等效字級。
 - caption（圖說）
 - code（程式碼）
 
-**SEVERITY**
+**SEVERITY**  
 ERROR
 
 ---
 
 ## C04 — 不得為了塞下內容而縮小（Never Shrink to Solve Complexity）
 
-**RULE**
+**RULE**  
 不得僅為了讓內容塞得下而縮小字級或視覺尺度。
 
 **ACTION ORDER（處理順序）**
@@ -181,14 +181,14 @@ ERROR
 2. Visualize（視覺化）
 3. Split（拆分）
 
-**SEVERITY**
+**SEVERITY**  
 若文字被縮小至低於最小值，判定為 ERROR。
 
 ---
 
 ## C05 — 標題要傳達意義（Titles Communicate Meaning）
 
-**RULE**
+**RULE**  
 標題應傳達該頁的結論（takeaway），而非僅是主題名稱。
 
 不佳：
@@ -199,19 +199,19 @@ ERROR
 較佳：
 - Playbook 將一次性的探索轉換成可重複利用的組織經驗。
 
-**CHECK**
+**CHECK**  
 語意檢查（Semantic lint）自問：
 
 > 若聽眾只讀標題，他們是否理解這頁想讓他們相信或記住什麼？
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C06 — 先判斷關係，再決定容器（Relationship Before Container）
 
-**RULE**
+**RULE**  
 在使用方框／卡片之前，先判斷資訊之間的關係。
 
 可能的關係：
@@ -225,31 +225,31 @@ WARNING
 
 容器不是預設選項。
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C07 — 裝飾需要理由（Decoration Requires Justification）
 
-**RULE**
+**RULE**  
 每一個視覺元素都必須服務於溝通。
 
-**CHECK**
+**CHECK**  
 自問：
 
 > 若移除這個元素，溝通效果是否會變弱？
 
 若否，它就是裝飾。
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C08 — 唯一結構性強調色（One Structural Accent）
 
-**RULE**
+**RULE**  
 每一頁投影片最多只能使用一個結構性強調色（structural accent color）。
 
 結構性強調色範例：
@@ -267,32 +267,32 @@ WARNING
 - 琥珀色 = 警告
 - 藍色 = 主要結構性強調色
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C09 — 構圖不得重複超過兩次（No Repeated Composition > 2）
 
-**RULE**
+**RULE**  
 相同的視覺輪廓（visual silhouette）不得連續出現超過兩次。
 
-**CHECK**
-僅比對 Pattern ID 是不夠的。
+**CHECK**  
+僅比對 Pattern ID 是不夠的。  
 需比較構圖輪廓：
 - 標題位置
 - 主要視覺區塊位置
 - 主軸方向
 - 主要區域數量
 
-**SEVERITY**
+**SEVERITY**  
 ERROR
 
 ---
 
 ## C10 — 內容字數上限（Content Maximum）
 
-**RULE**
+**RULE**  
 簡報頁面內容不得超過 120 字（words）。
 
 建議：
@@ -300,29 +300,29 @@ ERROR
 - MEDIUM：40–80
 - HIGH：80–120
 
-**SEVERITY**
+**SEVERITY**  
 ERROR
 
 ---
 
 ## C11 — 敘事目的（Narrative Purpose）
 
-**RULE**
+**RULE**  
 每一頁投影片都必須有明確的敘事目的。
 
-**CHECK**
+**CHECK**  
 必須能完成這句話：
 
 > 這一頁的存在是為了……
 
-**SEVERITY**
+**SEVERITY**  
 ERROR
 
 ---
 
 ## C12 — 證據必須有脈絡（Evidence Must Have Context）
 
-**RULE**
+**RULE**  
 孤立的數字不算證據。
 
 一個數字至少應回答下列其中一項：
@@ -334,14 +334,14 @@ ERROR
 - 比率 vs 基準？
 - 為什麼重要？
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C13 — 誠實優於完整（Honesty Over Completeness）
 
-**RULE**
+**RULE**  
 未經驗證的資訊，不得以與已驗證資訊相同的確定性呈現。
 
 信心狀態：
@@ -351,36 +351,36 @@ WARNING
 - ❓ 未知
 - ⏳ 暫緩
 
-**SEVERITY**
+**SEVERITY**  
 若隱藏不確定性，判定為 ERROR。
 
 ---
 
 ## C14 — 視覺張力是節奏性的，而非恆定的（Visual Boldness Is Rhythmic, Not Constant）
 
-**RULE**
+**RULE**  
 有選擇性地使用 BOLD 構圖。
 
-**TARGET（目標）**
+**TARGET（目標）**  
 每 3–5 頁至少要有一頁 BOLD。
 
-**CHECK**
+**CHECK**  
 若連續 5 頁都沒有 BOLD 投影片，提出警告。
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
 
 ## C15 — BOLD 必須言之有物（BOLD Slides Must Be Earned）
 
-**RULE**
+**RULE**  
 BOLD 投影片必須使用至少一個已定義的 Signature Motif，並強化該頁的結論。
 
-**CHECK**
+**CHECK**  
 若移除 BOLD 手法後溝通效果不受影響，代表那是裝飾。
 
-**SEVERITY**
+**SEVERITY**  
 WARNING
 
 ---
@@ -564,7 +564,7 @@ INFO         #2563EB
 
 ## 標準投影片座標系統
 
-16:9
+16:9  
 13.333 × 7.5 in
 
 ## 安全範圍（Safe Area）
