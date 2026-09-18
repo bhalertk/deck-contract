@@ -922,22 +922,22 @@ Pattern（版型）是溝通功能，不是固定範本。
 
 ## P01 HERO
 
-Use when（使用時機）：
+Use when：
 - 引入核心概念
 - 開場
 
-Do not use when（不使用時機）：
+Do not use when：
 - 該頁只是章節標題頁
 - 沒有明確的論點（thesis）
 
-Default motif（預設視覺動機）：
+Default motif：
 - M-A Editorial Scale
 - M-C Cropped Geometry
 
-Density（密度）：
+Density：
 - LOW
 
-Reference（參考頁）：
+Reference：
 - Reference Deck Slide 01
 
 ---
@@ -1054,7 +1054,7 @@ Use when：
 Do not use when：
 - 聽眾只需要理解單一概念性關係
 
-Rules（規則）：
+Rules：
 - 只有一個主導的流向
 - 邊界必須清楚可見
 - 漸進式揭露（progressive disclosure）
