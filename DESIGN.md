@@ -1,8 +1,8 @@
-# Eric Presentation Design System v1.2
+# Eric Presentation Design System v1.3
 
 狀態：Canonical（權威版本）  
 語言：zh-Hant 優先，支援雙語編輯  
-參考實作：`AI_Playbook_DesignSystem_v1.1.html`
+參考實作：由各簡報的 Contract 選擇性指定
 
 ---
 
@@ -49,8 +49,7 @@ constraints:
 must_include: []
 must_avoid: []
 
-reference_deck:
-  - AI_Playbook_DesignSystem_v1.1.html
+reference_deck: []
 
 energy_plan: []
 forbidden_patterns: []
@@ -479,7 +478,7 @@ PPTX 標準：
 避免在以下位置換行：
 
 - 300 / 月
-- 2.9 秒
+- 3.2 秒
 - 5.3 倍
 - 15 pt
 
@@ -545,7 +544,7 @@ INFO         #2563EB
 ```
 
 備註：
-`DANGER` 對齊參考簡報中的珊瑚色。
+`DANGER` 使用克制的珊瑚色，避免與結構性強調色競爭。
 
 ## 色彩使用規則
 
@@ -823,8 +822,8 @@ BOLD → FOCUSED → FOCUSED → CALM → BOLD
 - 存在有意義的基準值（baseline）
 
 範例：
-- 5,523 vs 1,038
-- 9,702 created, then removed
+- 72% vs 41%
+- 1,240 created, then removed
 
 ## NR02 — Metric Band（指標群組）
 
@@ -832,16 +831,16 @@ BOLD → FOCUSED → FOCUSED → CALM → BOLD
 - 3–5 個指標共同描述系統狀態
 
 範例：
-- 12,895 nodes
-- 18,618 edges
-- 10,756 links
-- 300/month
+- 128 services
+- 342 dependencies
+- 87% coverage
+- 45/month
 
 ## NR03 — Before / After（前後對比）
 
 使用：
-- 860 → 11,038
-- 2.9 → 11.7 sec
+- 18 → 240
+- 1.2 → 4.8 sec
 
 當變化本身很重要時，優先使用方向性標記法。
 
@@ -916,7 +915,6 @@ Pattern（版型）是溝通功能，不是固定範本。
 - Do not use when（不使用時機）
 - Default motif（預設視覺動機）
 - Density（密度）
-- Reference（參考頁）
 
 ---
 
@@ -937,9 +935,6 @@ Default motif：
 Density：
 - LOW
 
-Reference：
-- Reference Deck Slide 01
-
 ---
 
 ## P02 STATEMENT
@@ -958,9 +953,6 @@ Default motif：
 Density：
 - LOW
 
-Reference：
-- Slide 05
-
 ---
 
 ## P03 PROBLEM
@@ -977,9 +969,6 @@ Default motif：
 
 Density：
 - MEDIUM
-
-Reference：
-- Slide 03
 
 ---
 
@@ -1002,9 +991,6 @@ Default motif：
 Density：
 - MEDIUM
 
-Reference：
-- Slide 02
-
 ---
 
 ## P05 PROCESS
@@ -1022,9 +1008,6 @@ Default motif：
 Density：
 - MEDIUM
 
-Reference：
-- Slide 04
-
 ---
 
 ## P06 RELATIONSHIP
@@ -1040,9 +1023,6 @@ Do not use when：
 
 Density：
 - MEDIUM
-
-Reference：
-- 非參考簡報中的主要版型；請套用 Architecture 相關規則
 
 ---
 
@@ -1079,10 +1059,6 @@ Default motif：
 
 Density：
 - MEDIUM
-
-Reference：
-- Slide 06
-- Slide 12
 
 ---
 
@@ -1137,9 +1113,6 @@ Default motif：
 Density：
 - LOW/MEDIUM
 
-Reference：
-- Slide 13
-
 ---
 
 ## P12 SUMMARY
@@ -1152,9 +1125,6 @@ Do not use when：
 
 Density：
 - LOW
-
-Reference：
-- Slide 13
 
 ---
 
@@ -1173,9 +1143,6 @@ Default motif：
 Density：
 - MEDIUM
 
-Reference：
-- Slide 09
-
 ---
 
 ## P14 COST SPLIT
@@ -1192,9 +1159,6 @@ Default motif：
 
 Density：
 - MEDIUM
-
-Reference：
-- Slide 10
 
 ---
 
@@ -1214,48 +1178,28 @@ Default motif：
 Density：
 - MEDIUM
 
-Reference：
-- Slide 11
-
 ---
 
-# 5. REFERENCE DECK（參考簡報）
+# 5. REFERENCE DECK（參考簡報，可選）
 
-標準參考檔案：
+Reference deck 是專案層級的輸入，不是本設計系統的必要組成，也不會納入此 repo。
 
-`AI_Playbook_DesignSystem_v1.1.html`
-
-當某條抽象規則存在多種合理的視覺詮釋方式時，優先採用參考簡報所展示的視覺語言。
-
-## 5.1 版型對照表（Pattern Map）
-
-| Slide | Pattern | Energy | Motif |
-|---|---|---|---|
-| 01 | HERO | BOLD | M-A + M-C |
-| 02 | CONTRAST | FOCUSED | M-G |
-| 03 | PROBLEM | FOCUSED | M-A |
-| 04 | PROCESS / REFRAME | FOCUSED | M-B |
-| 05 | STATEMENT | BOLD | M-F |
-| 06 | EVIDENCE | FOCUSED | M-A + M-D |
-| 07 | EVIDENCE / PITFALL | BOLD | M-A |
-| 08 | EVIDENCE | FOCUSED | text-led |
-| 09 | QUALITY GATE | FOCUSED | asymmetric zone |
-| 10 | COST SPLIT | FOCUSED | M-B |
-| 11 | ADOPTION STEPS | BOLD | keyed step |
-| 12 | EVIDENCE | FOCUSED | metric band |
-| 13 | DECISION / SUMMARY | BOLD | M-F |
-
-## 5.2 參考原則
-
-參考簡報不是可以逐字複製的範本。
-
-用它來校準：
+若 Contract 指定 reference deck，可用它來校準：
 - scale（比例尺度）
 - asymmetry（不對稱）
 - whitespace（留白）
 - headline behavior（標題表現方式）
 - rhythm（節奏）
 - 大膽時刻的使用方式
+
+Reference deck 不得：
+
+- 覆蓋 Contract 或 Canon。
+- 成為事實與文案的第二份來源。
+- 被逐頁複製成固定範本。
+- 迫使所有專案沿用相同頁數或敘事順序。
+
+若未指定 reference deck，直接依 Language、Pattern Library 與 Critique 執行。
 
 ---
 
@@ -1665,6 +1609,13 @@ Visual Form
 ---
 
 # 10. CHANGELOG（變更紀錄）
+
+## v1.3
+
+- 將設計系統與特定專案的內容及參考簡報解耦。
+- Reference deck 改為由各專案 Contract 選擇性指定。
+- 移除 Pattern 對特定參考簡報頁碼的依賴。
+- 明確規定 reference deck 不得覆蓋 Contract 或 Canon。
 
 ## v1.2
 
