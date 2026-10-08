@@ -1,6 +1,6 @@
 # deck-contract
 
-**Eric Presentation Design System v1.5** — 一套可被機器檢查（machine-checkable）的個人簡報設計標準，用於產生簡報（PPTX 或離線 HTML），讓人類與 AI 生成器都能遵循一致的設計判斷。
+**Eric Presentation Design System v1.6** — 一套可被機器檢查（machine-checkable）的個人簡報設計標準，用於產生簡報（PPTX 或離線 HTML），讓人類與 AI 生成器都能遵循一致的設計判斷。
 
 這個 repo 保存可跨題目重複使用的設計規格，不保存特定專案的內容母文件、參考簡報或衍生產物。`golden/` 中的測試素材都是虛構的，用途是驗證規則，不是專案內容。
 
@@ -11,6 +11,7 @@
 | [`DESIGN.md`](DESIGN.md) | 設計系統規格 | 簡報的 Contract、Canon、視覺語言、Pattern 與 QA 標準 |
 | [`scripts/check_repo.py`](scripts/check_repo.py) | 規格完整性檢查 | Canon、Pattern、Motif、Smell 編號與欄位、ID 引用、CHANGELOG 與本地文件連結 |
 | [`scripts/check_deck.py`](scripts/check_deck.py) | HTML 簡報檢查 | 每頁文字單位、頁數、BOLD 節奏、禁用詞、emoji、絕對用語、外部資源、深色模式、明體字型 |
+| [`templates/deck.html`](templates/deck.html) | HTML 簡報範本 | 配色、字型、版面、表格與信心標籤樣式、換頁程式、列印設定 |
 | [`golden/README.md`](golden/README.md) | Golden Deck 測試素材 | 用固定素材比較各版本的產出，確認改版是否真的進步 |
 
 `DESIGN.md` 是唯一的 canonical specification。專案可以在自己的 Contract 中指定 reference deck，但該參考只用於該專案，不會改變本 repo 的規則優先順序。
@@ -56,6 +57,22 @@ Source Material → Contract → Narrative Spine → Slide Intents → Takeaways
 
 生成刻意被安排在流程後段——結構與意圖必須先確立，才能進行任何視覺設計。
 
+## 製作與播放 HTML 簡報
+
+新簡報從 [`templates/deck.html`](templates/deck.html) 複製開始，裡面已經包含 v1.6 的配色、字型、版面與換頁程式。
+
+直接用瀏覽器開啟檔案即可播放：
+
+| 按鍵 | 動作 |
+|---|---|
+| → 、空白鍵、Page Down、Enter | 下一頁 |
+| ← 、Shift + 空白鍵、Page Up | 上一頁 |
+| Home ／ End | 第一頁 ／ 最後一頁 |
+| F | 全螢幕 |
+| O | 切換簡報模式與總覽模式 |
+
+簡報遙控筆可以直接使用。網址加上 `#overview` 會以總覽模式開啟，`#3` 會直接開到第 3 頁。用瀏覽器列印時，每張投影片印成一頁 A4 橫式，可以另存成 PDF。
+
 ## 自動檢查
 
 兩支檢查器都只使用 Python 3 標準函式庫，不需額外安裝套件。兩者的 PASS 意義不同，不應混為一談。
@@ -100,6 +117,7 @@ python scripts/check_deck.py path/to/deck.html --contract path/to/contract.yaml
 - 3.11 與 C13：emoji，以及需要樣本支持的絕對用語。
 - 3.5：載入外部資源（線上字型、CDN、外部圖片）為 ERROR；跟隨系統深色模式為 WARNING。
 - 3.2：字型清單中出現明體或襯線字型。
+- 3.7：缺少換頁程式。
 
 字級、溢出、安全邊界、對比、強調色數量與證據對應需要渲染後的畫面或人工審查，檢查器會列為 NOT CHECKED。
 
