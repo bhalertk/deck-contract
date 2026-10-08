@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文件審查模型試辦</title>
+<style>
+  /* Fixed light theme and system fonts only (DESIGN.md 3.2, 3.5) */
+  :root {
+    color-scheme: light;
+    --paper: #F8F5EF;
+    --ink: #1F1D1A;
+    --muted: #5F584F;
+    --rule: #CFC6B8;
+    --fill: #ECE5D9;
+    --accent: #B5562F;
+    --accent-tint: #F6E7DE;
+    --ok-bg: #E2EDE5; --ok: #2F6B4A;
+    --warn-bg: #F5E6CB; --warn: #855610;
+    --unk-bg: #E9E4DC; --unk: #5F584F;
+    --sans: "Microsoft JhengHei", "微軟正黑體", "PingFang TC", "Noto Sans TC", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E4DED3; color: var(--ink); font-family: var(--sans); padding: 32px 16px; }
+  .deck { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+
+  /* 1920-wide design space, scaled with container units */
+  .slide { container-type: inline-size; position: relative; aspect-ratio: 16 / 9; background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+  .frame { position: absolute; inset: 0; padding: 5.5% 6.5% 4.5%; display: grid; grid-template-rows: auto auto 1fr auto auto; }
+  .kicker { font-size: 1.1cqw; color: var(--muted); letter-spacing: .08em; font-weight: 700; }
+  .title { font-size: 3.1cqw; line-height: 1.3; margin: 1.2cqw 0 0; font-weight: 700; max-width: 80%; }
+  .title, h3 { word-break: keep-all; overflow-wrap: anywhere; }
+  .nb { white-space: nowrap; }
+  .viz { min-height: 0; display: flex; align-items: center; padding: 2cqw 0 1cqw; }
+  .viz > * { width: 100%; }
+  .viz svg { height: 100%; max-height: 100%; display: block; }
+  .footer { display: flex; justify-content: space-between; font-size: 1cqw; color: var(--muted); }
+  .note { font-size: 1.3cqw; color: var(--muted); line-height: 1.6; margin: 0 0 1.4cqw; }
+  svg text { font-family: var(--sans); }
+
+  .tbl { width: 100%; border-collapse: collapse; font-size: 1.55cqw; }
+  .tbl th { text-align: left; font-size: 1.15cqw; color: var(--muted); font-weight: 700; padding: 0 1.2cqw 1cqw; border-bottom: 2px solid var(--ink); }
+  .tbl td { padding: 1.5cqw 1.2cqw; border-bottom: 1px solid var(--rule); vertical-align: middle; line-height: 1.45; }
+  .tbl td:first-child { font-weight: 700; }
+  .tbl tr.hot td { background: var(--accent-tint); }
+  .tbl tr.hot td:first-child { box-shadow: inset .5cqw 0 0 var(--accent); }
+  .pill { display: inline-block; padding: .3cqw 1cqw; border-radius: 99px; font-size: 1.2cqw; font-weight: 700; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+  .pill.unk { background: var(--unk-bg); color: var(--unk); }
+
+  /* 1: opening, framed by whitespace and one rule (M-H) */
+  .s1 .frame { grid-template-rows: auto 1fr auto; }
+  .s1 .open { display: grid; grid-template-columns: 1.35fr 1fr; gap: 6cqw; align-items: center; }
+  .s1 .title { font-size: 3.6cqw; max-width: none; margin: 0; }
+  .s1 .context { font-size: 1.6cqw; color: var(--muted); margin: 2.4cqw 0 0; }
+  .s1 .stance { font-size: 1.9cqw; font-weight: 700; margin: 1.4cqw 0 0; padding-top: 1.4cqw; border-top: 1px solid var(--rule); }
+  .s1 .scene { font-size: 1.6cqw; line-height: 1.8; padding-left: 2cqw; border-left: 4px solid var(--accent); margin: 0; }
+  .s1 .scene b { display: block; font-size: 2.1cqw; margin-bottom: 1cqw; }
+  /* deck-runtime:start — presentation mode, overview mode, print. Keep in sync with the script below. */
+  html.present, html.present body { height: 100%; overflow: hidden; }
+  html.present body { padding: 0; background: #2B2926; }
+  html.present .deck { max-width: none; height: 100vh; display: flex; align-items: center; justify-content: center; }
+  html.present .slide { flex: none; width: min(100vw, calc(100vh * 16 / 9)); box-shadow: none; }
+  html.present .slide:not(.is-current) { display: none; }
+  @page { size: A4 landscape; margin: 0; }
+  @media print {
+    html, body { background: #fff !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+    .deck { display: block !important; max-width: none !important; height: auto !important; }
+    .slide { display: block !important; width: 297mm !important; margin: 21mm 0 0; box-shadow: none !important; break-after: page; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .slide:last-child { break-after: auto; }
+  }
+  /* deck-runtime:end */
+</style>
+</head>
+<body>
+<main class="deck">
+
+  <section class="slide s1" aria-label="第 1 頁" data-density="LOW" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>文件審查模型試辦　虛構素材</div>
+      <div class="open">
+        <div>
+          <h1 class="title">模型可以協助審查，但不能代替<span class="nb">承辦人做決定。</span></h1>
+          <p class="context">試辦三個月：模型先整理，承辦人再逐項確認。</p>
+          <p class="stance">我的判斷：值得擴大試辦，但只限於初步整理這一步。</p>
+        </div>
+        <p class="scene"><b>「如果模型讀錯了，誰負責？」</b>上個月例會的提問。答案是承辦人，所以模型只做承辦人能檢查的部分。</p>
+      </div>
+      <div class="footer" data-chrome><span>程式開發組</span><span>1 / 3</span></div>
+    </div>
+  </section>
+
+  <section class="slide s2" aria-label="第 2 頁" data-density="MEDIUM" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>人力時間</div>
+      <h2 class="title">每份文件的人工審查時間，從 <span class="nb">190 分鐘</span>降到 <span class="nb">65 分鐘</span>。</h2>
+      <div class="viz">
+        <!-- 1 minute = 5.8 units -->
+        <svg viewBox="0 0 1632 470" role="img" aria-label="試辦前承辦人 190 分鐘；試辦後承辦人 65 分鐘，另有模型 42 分鐘不佔人力">
+          <defs>
+            <pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <rect width="14" height="14" fill="var(--fill)"/>
+              <line x1="0" y1="0" x2="0" y2="14" stroke="var(--rule)" stroke-width="6"/>
+            </pattern>
+          </defs>
+          <g font-size="34" font-weight="700" fill="var(--ink)">
+            <text x="0" y="118">試辦前</text>
+            <text x="0" y="318">試辦後</text>
+          </g>
+          <rect x="170" y="60" width="1102" height="100" fill="#8C847A"/>
+          <text x="200" y="122" font-size="32" font-weight="700" fill="#fff">承辦人 190 分鐘</text>
+
+          <rect x="170" y="260" width="377" height="100" fill="var(--accent)"/>
+          <text x="200" y="322" font-size="32" font-weight="700" fill="#fff">承辦人 65 分鐘</text>
+          <rect x="547" y="260" width="244" height="100" fill="url(#hatch)" stroke="var(--rule)" stroke-width="2"/>
+          <text x="669" y="306" text-anchor="middle" font-size="26" font-weight="700" fill="var(--ink)">模型 42 分鐘</text>
+          <text x="669" y="342" text-anchor="middle" font-size="22" fill="var(--muted)">不佔人力</text>
+
+          <line x1="547" y1="160" x2="547" y2="260" stroke="var(--accent)" stroke-width="3" stroke-dasharray="8 6"/>
+          <text x="1320" y="300" font-size="72" font-weight="700" fill="var(--ink)">約 66%</text>
+          <text x="1320" y="346" font-size="28" fill="var(--muted)">人工時間減少</text>
+        </svg>
+      </div>
+      <p class="note">口徑：200 份文件，每份的實際作業時間，不含排隊。常聽到的「2 天」是日曆時間，不能直接比較。</p>
+      <div class="footer" data-chrome><span>程式開發組</span><span>2 / 3</span></div>
+    </div>
+  </section>
+
+  <section class="slide s3" aria-label="第 3 頁" data-density="MEDIUM" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>能力邊界</div>
+      <h2 class="title">條款引用可以交給模型，<span class="nb">手寫註記</span>和<span class="nb">新型態契約</span>還不行。</h2>
+      <div class="viz">
+        <table class="tbl">
+          <thead><tr><th>文件情況</th><th>模型表現</th><th>狀態</th><th>處理方式</th></tr></thead>
+          <tbody>
+            <tr><td>跨頁的條款引用</td><td>200 份樣本中未發現錯誤</td><td><span class="pill ok">已驗證</span></td><td>交給模型初步整理</td></tr>
+            <tr class="hot"><td>手寫的修改註記</td><td>7 份中有 4 份漏掉</td><td><span class="pill warn">推測，樣本不足</span></td><td>承辦人全文複核</td></tr>
+            <tr><td>新型態的契約</td><td>尚未測試</td><td><span class="pill unk">未知</span></td><td>一律人工處理</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" data-chrome><span>程式開發組</span><span>3 / 3</span></div>
+    </div>
+  </section>
+
+</main>
+<!-- deck-runtime v1: keyboard navigation, presentation and overview modes. Inline, no dependencies. -->
+<script data-deck-runtime="1">
+(function () {
+  var root = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  if (!slides.length) return;
+  var current = 0;
+
+  function slideFromHash() {
+    var n = parseInt(location.hash.slice(1), 10);
+    return n >= 1 && n <= slides.length ? n - 1 : current;
+  }
+  function setHash(value) {
+    try { history.replaceState(null, "", "#" + value); } catch (e) { /* opaque origins refuse; position is just not remembered */ }
+  }
+  function show(index) {
+    current = Math.max(0, Math.min(slides.length - 1, index));
+    var presenting = root.classList.contains("present");
+    slides.forEach(function (slide, i) {
+      slide.classList.toggle("is-current", i === current);
+      if (presenting && i !== current) slide.setAttribute("aria-hidden", "true");
+      else slide.removeAttribute("aria-hidden");
+    });
+    if (presenting) setHash(current + 1);
+  }
+  function setMode(presenting) {
+    root.classList.toggle("present", presenting);
+    show(current);
+    if (!presenting) {
+      setHash("overview");
+      slides[current].scrollIntoView({ block: "start" });
+    }
+  }
+  function toggleFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (root.requestFullscreen) root.requestFullscreen().catch(function () {});
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var key = e.key;
+    if (key === "f" || key === "F") { toggleFullscreen(); e.preventDefault(); return; }
+    if (key === "o" || key === "O") { setMode(!root.classList.contains("present")); e.preventDefault(); return; }
+    if (!root.classList.contains("present")) return;  // overview mode keeps normal scrolling
+    var next = key === "ArrowRight" || key === "ArrowDown" || key === "PageDown" || key === "Enter" || (key === " " && !e.shiftKey);
+    var prev = key === "ArrowLeft" || key === "ArrowUp" || key === "PageUp" || key === "Backspace" || (key === " " && e.shiftKey);
+    if (next) show(current + 1);
+    else if (prev) show(current - 1);
+    else if (key === "Home") show(0);
+    else if (key === "End") show(slides.length - 1);
+    else return;
+    e.preventDefault();
+  });
+  window.addEventListener("hashchange", function () {
+    if (root.classList.contains("present")) show(slideFromHash());
+  });
+
+  current = slideFromHash();
+  setMode(location.hash !== "#overview");
+})();
+</script>
+</body>
+</html>

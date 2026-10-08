@@ -10,6 +10,8 @@
 | v1.4 | project-report | 3 ERROR（C10：121、152、160 單位） | | 10：邏輯矛盾 1、量測口徑 2、口號式標題 1、模糊用語 1、絕對用語 1、預告句 1、過度對稱 1、斷行 2 | 基準版本。在 C10 定義計算方式與 check_deck 建立之前產生，C10 的結果是事後補跑。 |
 | v1.5 | technical-review | 0 ERROR，4 WARNING（C10：MEDIUM 頁 82–87 單位） | 4：C10 超量 1（刪除與根因頁重複的說明）、斷行 3（另有 2 處預防性修正，不計） | 使用者審查：文字可以，畫面不行，細節待確認 | 7 頁。C14 由 Contract 覆蓋，每頁也寫明理由。 |
 | v1.5 | technical-review（r2） | 0 ERROR，2 WARNING（C10：MEDIUM 頁 98、103 單位） | 1：時間軸標籤溢出色塊 | 待審查 | 依使用者回饋重做畫面：固定淺色主題、每頁改以表格或圖表為主角。檔案為 `outputs/v1.5-r2.html`，舊版保留對照。 |
+| v1.5 | project-report | 0 ERROR，3 WARNING（C10：LOW 頁 97 單位、MEDIUM 頁 91 與 111 單位） | 2：標題句號單獨落行 1、說明文字擠到頁尾 1 | 待審查 | 依 v1.5 規則重新產生：人力時間改為堆疊長條圖，能力邊界改為表格。三頁都在 120 單位以內（v1.4 為 121、152、160）。 |
+| v1.5 | education（r2） | 0 ERROR，1 WARNING（C10：MEDIUM 頁 84 單位） | 2：說明文字擠到頁尾 1、流程圖字太小 1 | 待審查 | 依 v1.5 規則重做畫面：使用比例條、直向確認流程與含判斷節點的流程圖。檔案為 `outputs/v1.5-r2.html`。 |
 | v1.5 | education | 0 ERROR，1 WARNING（C10：LOW 頁 41 單位） | 3：斷行 3 | 使用者審查：文字可以，畫面不行，細節待確認 | 5 頁。 |
 
 ## v1.4 基準的觀察
@@ -38,6 +40,20 @@ technical-review 有 4 頁 MEDIUM 落在 82–87 單位，略高於 80。這些�
 
 **字型與離線環境**
 公司環境不能上網，也不能安裝軟體，所以不能依賴線上字型或未安裝的字型。開發機只裝了 Noto Sans TC，沒有 Noto Serif TC，所以 r2 之前的標題實際上退回到了新細明體。r2 改成只用系統內建字型：微軟正黑體優先，macOS 退回蘋方，標題用同一字族的粗體，不再使用任何明體。已寫入 DESIGN.md 3.2。
+
+**依 v1.5 規則重新產生後的 Density 資料**
+三個案例都依新規則產生後，C10 的 120 上限全部守住，但 Density 的建議區間經常被超過：
+
+| 案例 | 標為 LOW 的頁 | 標為 MEDIUM 的頁 |
+|---|---|---|
+| technical-review r2 | 37 | 103、98 |
+| project-report v1.5 | 97 | 91、111 |
+| education r2 | 37 | 57、69、84 |
+
+改成以圖表為主之後，圖上的標籤也算進文字單位，所以 MEDIUM 頁常落在 80 到 110 之間，渲染後並不擁擠。project-report 第 1 頁的 LOW 是 Contract 固定的，但開場需要交代判斷與例會的提問，97 單位比較接近 MEDIUM。建議下一版考慮把 MEDIUM 放寬到 40–110；LOW 的區間先不動，改為檢討 Contract 中的 Density 標示是否合理。
+
+**v1.6：換頁程式**
+technical-review r2、project-report v1.5 與 education r2 已套用 `templates/deck.html` 的換頁程式，內容沒有改變。這三份檔案的文字單位與檢查結果不受影響。
 
 **舊版產出與新規則**
 v1.4 project-report、v1.5 technical-review（r1）與 v1.5 education 都在字型與主題規則之前產生，check_deck 會對它們提出 3.2、3.5 的警告。這些檔案保留原樣作為紀錄，下一輪測試時依新規則重新產生。

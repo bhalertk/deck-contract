@@ -1,0 +1,64 @@
+# 產生器依 DESIGN.md v1.5 第 1.3、1.4 節撰寫的 Slide Contract，對應 v1.5-r2.html。
+slides:
+  - intent: 告訴聽眾從哪裡開始，以及已經有多少同仁在用
+    takeaway: 先從解釋舊程式碼和寫測試初稿開始
+    pattern: P01
+    density: LOW
+    energy: FOCUSED
+    motif: M-H
+    visual_rationale: 開場以比例條呈現「120 位中有 46 位」，比一句數字更直覺；其餘以留白收住
+    evidence:
+      - claim: 120 位同仁中有 46 位在用
+        source: Q-01
+        calculation: 46 / 120，比例條長度 625.6 / 1632
+        basis: 開發部門全體，自行填答
+        status: 已驗證
+
+  - intent: 先承認聽眾的擔心，並指出在哪一頁回答
+    takeaway: 還沒開始的人，多半卡在兩個擔心
+    pattern: P03
+    density: MEDIUM
+    energy: FOCUSED
+    motif: M-G
+    visual_rationale: 兩個擔心並列，各自標出回答的頁碼，讓整份簡報的結構一目了然
+    evidence:
+      - claim: 主要原因是不確定能輸入哪些資料、擔心產出有錯
+        source: Q-03
+        calculation: 無
+        basis: 74 位未使用者，可複選
+        status: 已驗證
+
+  - intent: 回答第一個擔心：資料
+    takeaway: 客戶資料、帳號、交易紀錄一律不輸入
+    pattern: P02
+    density: MEDIUM
+    energy: BOLD
+    motif: M-A
+    evidence: []
+
+  - intent: 回答第二個擔心：用同仁的經驗帶出確認的做法
+    takeaway: 它很會解釋舊程式碼，但也會解釋錯
+    pattern: P02
+    density: MEDIUM
+    energy: FOCUSED
+    motif: M-B
+    visual_rationale: 經驗本身是引言，學到的做法是三步驟，用直向流程呈現「確認」在中間
+    evidence:
+      - claim: 同仁遇過它把欄位用途解釋錯
+        source: 一位同仁的經驗
+        calculation: 無
+        basis: 單一案例
+        status: 已驗證
+
+  - intent: 給出可以照做的開始方式
+    takeaway: 先挑低風險的工作，每次都自己確認
+    pattern: P15
+    density: HIGH
+    energy: FOCUSED
+    motif: M-B
+    evidence:
+      - claim: 寫測試初稿約省一半時間
+        source: Q-04
+        calculation: 無
+        basis: 使用者自評，沒有實際量測
+        status: 推測

@@ -30,7 +30,7 @@ Golden Deck 是一組固定的測試素材，用來回答一個問題：DESIGN.m
    python scripts/check_deck.py golden/<案例>/outputs/<版本>.html --contract golden/<案例>/contract.yaml
    ```
 
-4. 人工檢查 check_deck 標示為 NOT CHECKED 的項目，包括字級、溢出、證據對應與視覺焦點。
+4. 人工檢查 check_deck 標示為 NOT CHECKED 的項目，包括字級、溢出、證據對應與視覺焦點。簡報預設以簡報模式開啟，一次只顯示一頁；要一次檢視或截取整份簡報時，在網址後面加上 `#overview`。
 5. 修改到可以使用為止，並記錄每一次修改的類型。產生器自己發現的修改與使用者審查後的修改分開記錄。
 6. 在 [LOG.md](LOG.md) 新增一列。
 
