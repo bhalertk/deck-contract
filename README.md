@@ -1,6 +1,6 @@
 # deck-contract
 
-**Eric Presentation Design System v1.3** — 一套可被機器檢查（machine-checkable）的個人簡報設計標準，用於產生簡報（PPTX 或離線 HTML），讓人類與 AI 生成器都能遵循一致的設計判斷。
+**Eric Presentation Design System v1.4** — 一套可被機器檢查（machine-checkable）的個人簡報設計標準，用於產生簡報（PPTX 或離線 HTML），讓人類與 AI 生成器都能遵循一致的設計判斷。
 
 這個 repo 保存可跨題目重複使用的設計規格，不保存特定專案的內容母文件、參考簡報或衍生產物。
 
@@ -9,7 +9,7 @@
 | 檔案 | 角色 | 權威範圍 |
 |---|---|---|
 | [`DESIGN.md`](DESIGN.md) | 設計系統規格 | 簡報的 Contract、Canon、視覺語言、Pattern 與 QA 標準 |
-| [`scripts/check_repo.rb`](scripts/check_repo.rb) | 規格完整性檢查 | Canon、Pattern、Motif、Smell 編號與本地文件連結 |
+| [`scripts/check_repo.py`](scripts/check_repo.py) | 規格完整性檢查 | Canon、Pattern、Motif、Smell 編號與欄位、ID 引用、CHANGELOG 與本地文件連結 |
 
 `DESIGN.md` 是唯一的 canonical specification。專案可以在自己的 Contract 中指定 reference deck，但該參考只用於該專案，不會改變本 repo 的規則優先順序。
 
@@ -37,7 +37,7 @@
 
 1. **Contract（合約）**——在開始構圖前必須完成的必要元資訊（受眾、目標、核心訊息、限制條件）。
 2. **Canon（準則，C01–C15）**——不可協商的規則：一頁一個核心概念、一個視覺焦點、內文最小字級、不得為了塞進內容而縮小、標題即結論等。
-3. **Language（語言）**——字體排印、色彩 token、網格與間距、中文編輯排版、簽名式視覺動機（M-A–M-H）、視覺能量等級，以及數字修辭。
+3. **Language（語言）**——字體排印、色彩 token、網格與間距、中文編輯排版、簽名式視覺動機（M-A–M-H）、視覺能量等級、數字修辭，以及語氣（Voice）。
 4. **Pattern Library（版型庫，P01–P15）**——可重複使用的溝通版型（HERO、CONTRAST、PROCESS、EVIDENCE、ARCHITECTURE、DECISION 等），各自定義使用條件、預設動機與資訊密度。
 5. **Critique（審查）**——簡報「氣味」清單（S01–S15）、結構／語意／視覺三層檢查、嚴重程度分級（P0–P3），以及最終 PASS／REVISE 的驗收標準。
 
@@ -57,16 +57,20 @@ Source Material → Contract → Narrative Spine → Slide Intents → Takeaways
 執行：
 
 ```bash
-ruby scripts/check_repo.rb
+python scripts/check_repo.py
 ```
+
+需要 Python 3（只使用標準函式庫，不需額外安裝套件）。
 
 目前會檢查：
 
-- Canon 是否完整且依序為 C01–C15。
-- Pattern 是否完整且依序為 P01–P15。
+- Canon 是否完整且依序為 C01–C15，且每條都有 RULE、WHEN、CHECK、SEVERITY 欄位，SEVERITY 須標明 ERROR 或 WARNING。
+- Pattern 是否完整且依序為 P01–P15，且每個都有 Use when、Do not use when、Default motif、Density 欄位，Density 須為 LOW、MEDIUM 或 HIGH。
 - Motif 是否完整且依序為 M-A–M-H。
-- Presentation Smell 是否完整且依序為 S01–S15。
-- README 的本地 Markdown 連結是否存在。
+- Presentation Smell 是否完整且依序為 S01–S15，且每條都有觸發條件。
+- DESIGN.md 與 README 中引用的 C／P／S／M 編號都必須存在。
+- README 與 DESIGN.md 的版本號一致，且 CHANGELOG 最新一筆與標題版本相同。
+- README 與 DESIGN.md 的本地 Markdown 連結是否存在。
 
 這支檢查器只驗證規格本身的完整性。特定簡報的 structural、semantic 與 visual lint 應在各自專案內執行。
 
