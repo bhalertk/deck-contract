@@ -2,12 +2,15 @@
 
 **Eric Presentation Design System v1.6** — 一套可被機器檢查（machine-checkable）的個人簡報設計標準，用於產生簡報（PPTX 或離線 HTML），讓人類與 AI 生成器都能遵循一致的設計判斷。
 
+> **給 AI 助理**：如果使用者要你「讀 deck-contract 幫我做簡報」，請先讀 [`AGENTS.md`](AGENTS.md)，並依照其中的步驟進行。
+
 這個 repo 保存可跨題目重複使用的設計規格，不保存特定專案的內容母文件、參考簡報或衍生產物。`golden/` 中的測試素材都是虛構的，用途是驗證規則，不是專案內容。
 
 ## 核心檔案
 
 | 檔案 | 角色 | 權威範圍 |
 |---|---|---|
+| [`AGENTS.md`](AGENTS.md) | AI 助理的操作手冊 | 製作簡報的步驟、必讀章節、檢查清單與禁止事項 |
 | [`DESIGN.md`](DESIGN.md) | 設計系統規格 | 簡報的 Contract、Canon、視覺語言、Pattern 與 QA 標準 |
 | [`scripts/check_repo.py`](scripts/check_repo.py) | 規格完整性檢查 | Canon、Pattern、Motif、Smell 編號與欄位、ID 引用、CHANGELOG 與本地文件連結 |
 | [`scripts/check_deck.py`](scripts/check_deck.py) | HTML 簡報檢查 | 每頁文字單位、頁數、BOLD 節奏、禁用詞、emoji、絕對用語、外部資源、深色模式、明體字型 |
@@ -56,6 +59,24 @@ Source Material → Contract → Narrative Spine → Slide Intents → Takeaways
 ```
 
 生成刻意被安排在流程後段——結構與意圖必須先確立，才能進行任何視覺設計。
+
+## 用 AI 助理製作新簡報
+
+1. 取得最新版本：在 deck-contract 資料夾執行 `git pull`。
+2. 另外建立一個簡報資料夾，放入素材，用 VS Code 開啟。**不要把素材或簡報放進 deck-contract**：這個 repo 是公開的。
+3. 對 GitHub Copilot 或 Claude Code 說：
+
+   ```text
+   請讀 D:\WorkZone\deck-contract，依照裡面的說明，用這個資料夾的素材幫我做簡報。
+   ```
+
+   路徑請換成 deck-contract 在你電腦上的位置。
+
+4. AI 助理會依照 [`AGENTS.md`](AGENTS.md) 的步驟，先確認 Contract（缺少的資訊會問你），再在簡報資料夾產生 `contract.yaml`、`slides.yaml` 與 `deck.html`。
+
+如果 AI 助理回答讀不到 deck-contract，在 VS Code 選「檔案 → 將資料夾新增至工作區」，把 deck-contract 加入同一個工作區後再試一次。
+
+目前這套規則是用 Claude 調整的。第一次使用其他 AI 助理時，建議先拿 [`golden/`](golden/README.md) 的一個案例測試，和現有的產出比較。
 
 ## 製作與播放 HTML 簡報
 

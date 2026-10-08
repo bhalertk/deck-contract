@@ -17,7 +17,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 ROOT = Path(__file__).resolve().parent.parent
 
-REQUIRED_FILES = [".gitignore", "README.md", "DESIGN.md"]
+REQUIRED_FILES = [".gitignore", "README.md", "DESIGN.md", "AGENTS.md", "templates/deck.html"]
 
 EXPECTED_IDS = {
     "Canon": [f"C{n:02d}" for n in range(1, 16)],
@@ -178,7 +178,11 @@ def main():
     check_pattern(design, errors)
     check_smell(design, errors)
 
-    check_references({"DESIGN.md": design, "README.md": readme}, EXPECTED_IDS, errors)
+    agents = read("AGENTS.md")
+    check_references({"DESIGN.md": design, "README.md": readme, "AGENTS.md": agents}, EXPECTED_IDS, errors)
+    # AGENTS.md tells assistants which spec version to record; keep it in step with DESIGN.md.
+    if version and f"design_system: v{version}" not in agents:
+        errors.append(f"AGENTS.md does not tell assistants to record design_system: v{version}")
 
     # check_deck.py reads its banned-phrase list from DESIGN.md 3.13.
     if not banned_phrases(design):
@@ -190,6 +194,7 @@ def main():
 
     check_links("README.md", readme, errors)
     check_links("DESIGN.md", design, errors)
+    check_links("AGENTS.md", agents, errors)
 
     if errors:
         print(f"REVISE: {len(errors)} problem(s) found:", file=sys.stderr)
@@ -205,6 +210,7 @@ def main():
     print("PASS: every C/P/S/M reference resolves to a defined ID.")
     print("PASS: the 3.13 banned-phrase list is readable by check_deck.py.")
     print("PASS: project-specific examples are ignored.")
+    print("PASS: AGENTS.md references and spec version are current.")
     print("PASS: local links resolve.")
     return 0
 
