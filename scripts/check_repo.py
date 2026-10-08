@@ -9,6 +9,8 @@ import re
 import sys
 from pathlib import Path
 
+from check_deck import banned_phrases
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")
@@ -55,13 +57,29 @@ def sections(text, pattern):
     return result
 
 
+def bold_field_content(body, field):
+    """Text between a '**FIELD**' label and the next bold label or '---' rule; None if absent."""
+    match = re.search(rf"^\*\*{field}\*\*[^\n]*\n(.*?)(?=^\*\*[^*\n]+\*\*\s*$|^---|\Z)",
+                      body, flags=re.MULTILINE | re.DOTALL)
+    return match.group(1) if match else None
+
+
+def list_field_content(body, field):
+    """First non-empty line after a 'Field：' label; None if the label is absent."""
+    match = re.search(rf"^{field}\s*[:：]\s*\n+(.*)$", body, flags=re.MULTILINE)
+    return match.group(1) if match else None
+
+
 def check_canon(design, errors):
     found = {}
     for ident, body in sections(design, r"^(C\d{2})\b"):
         found[ident] = body
         for field in CANON_FIELDS:
-            if not re.search(rf"^\*\*{field}\*\*", body, flags=re.MULTILINE):
+            content = bold_field_content(body, field)
+            if content is None:
                 errors.append(f"Canon {ident} is missing the {field} field")
+            elif not content.strip():
+                errors.append(f"Canon {ident} has an empty {field} field")
         if "**SEVERITY**" in body:
             # The severity may be a bare word or a sentence ending in one, so search the block.
             block = body.split("**SEVERITY**", 1)[1].split("\n---", 1)[0]
@@ -73,8 +91,11 @@ def check_canon(design, errors):
 def check_pattern(design, errors):
     for ident, body in sections(design, r"^(P\d{2})\b"):
         for field in PATTERN_FIELDS:
-            if not re.search(rf"^{field}\s*[:：]", body, flags=re.MULTILINE):
+            content = list_field_content(body, field)
+            if content is None:
                 errors.append(f"Pattern {ident} is missing the '{field}' field")
+            elif not content.startswith("- "):
+                errors.append(f"Pattern {ident} has an empty '{field}' field")
         density = re.search(r"^Density\s*[:：]\s*\n+-\s*(\S+)", body, flags=re.MULTILINE)
         if density and not any(d in density.group(1) for d in PATTERN_DENSITIES):
             errors.append(f"Pattern {ident} has unknown Density {density.group(1)!r}")
@@ -159,6 +180,10 @@ def main():
 
     check_references({"DESIGN.md": design, "README.md": readme}, EXPECTED_IDS, errors)
 
+    # check_deck.py reads its banned-phrase list from DESIGN.md 3.13.
+    if not banned_phrases(design):
+        errors.append("DESIGN.md has no parseable '## 禁用詞' list for check_deck.py")
+
     for path in LOCAL_ONLY_FILES:
         if f"/{path}" not in gitignore:
             errors.append(f"local-only file is not ignored: {path}")
@@ -178,6 +203,7 @@ def main():
     print("PASS: Canon, Pattern, and Smell entries have their required fields.")
     print("PASS: CHANGELOG latest entry matches the DESIGN.md version.")
     print("PASS: every C/P/S/M reference resolves to a defined ID.")
+    print("PASS: the 3.13 banned-phrase list is readable by check_deck.py.")
     print("PASS: project-specific examples are ignored.")
     print("PASS: local links resolve.")
     return 0
