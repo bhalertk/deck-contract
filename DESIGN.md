@@ -1,4 +1,4 @@
-# Eric Presentation Design System v1.4
+# Eric Presentation Design System v1.5
 
 狀態：Canonical（權威版本）  
 語言：zh-Hant 優先，支援雙語編輯  
@@ -17,6 +17,8 @@
 5. **Critique suggestions**
 
 層級較高者覆蓋層級較低者。
+
+例外：Canon 中的品質底線不得被 Contract 覆蓋（見第 2 節）。6.7 的 P0 問題（溢出、裁切、文字無法閱讀）同樣不得以任何理由放行。
 
 模型或生成器在 Contract 未完成前，**不得**進入構圖（composition）階段。
 
@@ -51,9 +53,17 @@ must_avoid: []
 
 reference_deck: []
 
+voice: project-report | technical-review | education
+
 energy_plan: []
 forbidden_patterns: []
+
+canon_overrides: []
+# - id: C14
+#   reason: 連續六頁說明事故時間軸，插入 BOLD 頁會打斷推理
 ```
+
+`voice` 的定義見 3.13。`canon_overrides` 只能覆蓋設計約束，不能覆蓋品質底線（見第 2 節）。
 
 ## 1.2 Contract Gate（合約關卡）
 
@@ -99,17 +109,61 @@ slide:
   pattern:
   density: LOW | MEDIUM | HIGH
   energy: CALM | FOCUSED | BOLD
+  energy_override_reason:
+  motif:
+  visual_rationale:
   visual_anchor:
   transition:
+  evidence: []
 ```
 
 若 `intent` 或 `takeaway` 無法清楚寫出，該頁應刪除或重新設計。
+
+`motif` 與 Pattern 的 Default motif 不同時，必須在 `visual_rationale` 寫明理由（見第 4 節）。理由要說明內容的哪個特性需要這種視覺形式，例如「突出 MQ 節點的集中風險」，而不是「看起來比較好」。
+
+`energy_override_reason` 只在該頁刻意偏離 C14 的建議節奏時填寫。
+
+## 1.4 Evidence Contract（證據合約）
+
+**RULE**  
+投影片上每一個作為證據的數字或事實主張，都必須對應到 `evidence` 中的一筆紀錄。
+
+```yaml
+evidence:
+  - claim: 人工審查時間下降約 66%
+    source: 量測紀錄 R-012、R-013
+    calculation: (190 - 65) / 190
+    basis: 每份文件的實際作業時間，不含排隊等待
+    status: 已驗證 | 推測 | 未知 | 暫緩
+```
+
+`basis` 是 C12 要求的量測口徑。`status` 使用 3.11 的信心狀態。
+
+這些紀錄不一定出現在觀眾看到的投影片上，可以放在 Slide Contract 或產生器的中介資料中。
+
+**WHEN**  
+所有出現數字、比例或事實主張的投影片，以及任何修改標題、改寫文字或重排版面的修訂。
+
+**CHECK**  
+逐一比對投影片上的數字與 `evidence`：
+
+- 投影片上的數字找不到對應紀錄，標記為缺少來源。
+- 修訂後的標題或結論若不再被原有紀錄支持，標記為結論與證據脫鉤。
+- `status` 不是「已驗證」的主張，投影片上必須依 3.11 標示。
+
+**SEVERITY**  
+ERROR
 
 ---
 
 # 2. CANON
 
-Canon 規則不可協商，除非 Contract 明確覆蓋。
+Canon 分為兩類：
+
+- **品質底線（Quality Floor）**：C03、C13。不得被任何 Contract 覆蓋。
+- **設計約束（Design Constraint）**：其餘 Canon。可由 Deck Contract 的 `canon_overrides` 明確覆蓋，每一項都必須寫明理由。
+
+未寫明理由的覆蓋視為無效。
 
 ## C01 — 一頁一個概念（One Slide, One Idea）
 
@@ -184,7 +238,9 @@ ERROR
 3. Split（拆分）
 
 **CHECK**  
-比對縮小後的字級與 C03 的最小字級。若低於下限，依 ACTION ORDER 重新處理：先簡化，再視覺化，最後拆頁。
+比對每個文字角色的實際字級與 3.2 字級尺度。任一角色低於自己範圍的下限（例如 H1 低於 30 pt），即視為為了塞下內容而縮小，除非 Slide Contract 寫明了其他設計理由。HTML 依 3.5 換算。
+
+發現縮小時，依 ACTION ORDER 重新處理：先簡化，再視覺化，最後拆頁。若同時低於 C03 的最小字級，也違反 C03。
 
 **SEVERITY**  
 若文字被縮小至低於最小值，判定為 ERROR。
@@ -319,7 +375,15 @@ ERROR
 ## C10 — 內容字數上限（Content Maximum）
 
 **RULE**  
-簡報頁面內容不得超過 120 字（words）。
+簡報頁面內容不得超過 120 個文字單位。
+
+文字單位的計算方式：
+
+- 每個中文字元計 1。
+- 每個連續的英文單字計 1。
+- 每串連續的數字（含小數點與千分位）計 1。
+- 標點與空白不計。
+- Chrome（上緣標籤、頁尾、進度導覽等重複出現的框架元素，見 3.7）不計。
 
 建議：
 - LOW：20–40
@@ -330,7 +394,9 @@ ERROR
 所有非附錄投影片的內容文字。
 
 **CHECK**  
-計算每頁內容字數，超過 120 字即為 ERROR。另依 Density 對照建議區間，超出區間僅作提醒。
+依上述方式計算每頁的文字單位，超過 120 即為 ERROR。另依 Density 對照建議區間，超出區間僅作提醒。
+
+C10 是設計約束。內容確實需要更高密度時（例如附有完整標註的架構圖），可透過 `canon_overrides` 寫明理由覆蓋。
 
 **SEVERITY**  
 ERROR
@@ -427,6 +493,8 @@ WARNING
 **CHECK**  
 若連續 5 頁都沒有 BOLD 投影片，提出警告。
 
+這些頁面若在 Slide Contract 寫明了 `energy_override_reason`（例如連續說明事故時間軸與根因），則不提出警告。設計節奏應服從內容的張力，而不是頁數公式。
+
 **SEVERITY**  
 WARNING
 
@@ -490,15 +558,25 @@ Language 定義字體排印、色彩、構圖、視覺動機（motif）、版型
 
 ## 字體家族
 
-中文：
-- Noto Sans TC
-- Source Han Sans TC
+所有字型都必須是觀看者電腦上原本就有的系統字型。簡報經常在不能上網、不能安裝軟體的環境播放，因此不得使用線上字型，也不得依賴需要另外安裝的字型。
 
-英文：
-- Inter
+中文與英文：
+- Windows：微軟正黑體（Microsoft JhengHei）
+- macOS：蘋方（PingFang TC）
 
 程式碼：
-- JetBrains Mono（選用；僅用於 CODE pattern）
+- Consolas（Windows）、Menlo（macOS），僅用於 CODE pattern
+
+標題與內文使用同一字族，以字重區分層級。微軟正黑體只有 Light、Regular、Bold 三種字重，標題使用 Bold。
+
+不得退回明體。Windows 內建的明體只有新細明體，用在標題會顯得老舊，所以字型清單中不列任何明體或襯線字型。
+
+HTML 的字型清單：
+
+```css
+--sans: "Microsoft JhengHei", "微軟正黑體", "PingFang TC", "Noto Sans TC", sans-serif;
+--mono: Consolas, Menlo, monospace;
+```
 
 ## 字級尺度（Type Scale）
 
@@ -583,6 +661,18 @@ PPTX 標準：
 
 ---
 
+## CT06 — 詞語不可拆行（Keep Words Together）
+
+標題換行時，不得把一個詞拆成兩行，例如「補償機制」拆成「補償機」與「制」。中英混排的詞也不可拆開，例如「MQ 叢集」。
+
+HTML 實作：
+
+- 標題設定 `word-break: keep-all; overflow-wrap: anywhere;`，讓中文只在標點處換行，子句放不下時仍允許斷行，不會溢出。
+- 數字與單位（CT02）、中英混排的詞，用 `white-space: nowrap` 包起來。
+- 沒有標點的長標題，以手動換行決定斷點。
+
+---
+
 # 3.4 色彩（Color）
 
 ## 核心色彩 Token
@@ -649,9 +739,18 @@ INFO         #2563EB
 
 使用原則：
 - PPTX → pt / in
-- HTML → vh / vw
+- HTML → vh / vw，或以投影片寬度為基準的容器單位（cqw）
 
 兩種實作都必須保留相對比例與視覺層級。
+
+## HTML 單檔原則
+
+HTML 簡報必須能在不能上網的電腦上，直接用瀏覽器開啟並正確顯示。
+
+- 一份簡報就是一個 `.html` 檔，分享時不需要附帶其他檔案。
+- 不載入任何外部資源，包括線上字型、CDN 程式庫與外部圖片。圖表使用 inline SVG，圖片以 data URI 內嵌。
+- 字型依 3.2，只使用系統字型。
+- 固定使用淺色主題，不使用 `prefers-color-scheme` 跟隨觀看者的系統深色模式。同一份簡報在每台電腦上都必須看起來一樣；深色頁只能透過 M-F 刻意使用。
 
 ---
 
@@ -947,7 +1046,7 @@ BOLD → FOCUSED → FOCUSED → CALM → BOLD
 
 ## Code（程式碼）
 
-使用 JetBrains Mono。
+使用 3.2 的等寬字型（Consolas、Menlo）。
 
 優先原則：
 - 5–15 行相關程式碼
@@ -988,7 +1087,7 @@ BOLD → FOCUSED → FOCUSED → CALM → BOLD
 ## 規則
 
 **RULE**  
-文字以第一人稱敘述，優先用實際發生的事件、數字或判斷開場，而不是泛泛的概念。
+文字優先用實際發生的事件、數字或判斷開場，而不是泛泛的概念。人稱與語氣依 Deck Contract 的 `voice` 決定。
 
 **WHEN**  
 所有頁面的標題、正文與註解。
@@ -998,6 +1097,21 @@ BOLD → FOCUSED → FOCUSED → CALM → BOLD
 
 **SEVERITY**  
 WARNING
+
+## Voice Profiles
+
+好的 Voice 來自說話者的角色與任務，而不是固定的句型。
+
+**project-report（專案成果報告）**  
+以第一人稱敘述，說出自己的判斷與取捨。例如：「我的判斷是：值得擴大試辦，但只限於初步整理這一步。」
+
+**technical-review（技術架構審查）**  
+以客觀陳述為主，精確、可驗證、以風險為導向。判斷直接陳述，不加「我們認為」。例如：「目前的架構無法支援跨系統交易回復。」
+
+**education（教育訓練與推廣）**  
+循序說明，先讓聽眾理解原因，再說做法。語氣親近，但不說教，也不誇大效果。
+
+三種 profile 都適用本節的三個原則與寫法規則。新的 profile 應先有對應的固定測試案例，確認它確實產生不同的結果，再加入本節。
 
 ## 詳略
 
@@ -1038,7 +1152,22 @@ Pattern（版型）是溝通功能，不是固定範本。
 - Default motif（預設視覺動機）
 - Density（密度）
 
-Default motif 是偏好值，不是硬性規定。若內容更適合其他 motif，可以替換，但必須能說明替換的理由。若每一頁都照預設值排列，整份簡報就會變得千篇一律。
+Default motif 是偏好值，不是硬性規定。若內容更適合其他 motif，可以替換，但必須在 Slide Contract 的 `visual_rationale` 寫明替換的理由。若每一頁都照預設值排列，整份簡報就會變得千篇一律。
+
+## 視覺化優先
+
+簡報要把複雜的事情變簡單。資訊本身有結構時，用圖表或表格呈現結構，不要用文字排版代替：
+
+| 資訊的結構 | 呈現方式 |
+|---|---|
+| 多個項目、多個屬性的比較 | 表格 |
+| 事件的先後與經過時間 | 按比例繪製的時間軸 |
+| 系統之間的依賴與資料流 | 架構圖 |
+| 原因與結果 | 因果流程圖 |
+| 狀態、信心程度 | 表格加上 3.11 的文字標籤 |
+| 分階段的行動 | 路線圖 |
+
+圖表必須是該頁的視覺焦點（C02），字級依 3.2，投影到會議室時必須看得清楚。
 
 ---
 
@@ -1674,7 +1803,11 @@ Slide Intents
 ↓
 Takeaways
 ↓
+Evidence Mapping
+↓
 Pattern Selection
+↓
+Motif Selection
 ↓
 Density
 ↓
@@ -1749,6 +1882,21 @@ Visual Form
 ---
 
 # 10. CHANGELOG（變更紀錄）
+
+## v1.5
+
+- Canon 分為品質底線（C03、C13）與設計約束；品質底線與 P0 問題不得被 Contract 覆蓋，設計約束須透過 `canon_overrides` 寫明理由。
+- 新增 1.4 Evidence Contract：每個數字與事實主張都必須對應來源、計算方式、量測口徑與信心狀態。
+- Slide Contract 新增 `motif`、`visual_rationale`、`energy_override_reason`、`evidence`；Deck Contract 新增 `voice`、`canon_overrides`。
+- C04 的 CHECK 改為比對每個文字角色的字級範圍，不再只檢查最小字級。
+- C10 定義文字單位的計算方式，並明訂為可覆蓋的設計約束。
+- C14 允許以 `energy_override_reason` 偏離建議節奏。
+- 3.13 的人稱改由 `voice` 決定，新增 project-report、technical-review、education 三種 Voice Profile。
+- 生成流程新增 Evidence Mapping 與 Motif Selection 兩個步驟。
+- 3.2 改為只使用系統字型（微軟正黑體、蘋方、Consolas），不使用線上字型，不退回明體；標題以同字族的 Bold 區分層級。
+- 3.5 新增 HTML 單檔原則：不載入外部資源，固定淺色主題，不跟隨系統深色模式。
+- 3.3 新增 CT06：詞語不可拆行，並說明 HTML 的實作方式。
+- 第 4 節新增「視覺化優先」：資訊有結構時，以表格、時間軸、架構圖、因果流程圖或路線圖呈現。
 
 ## v1.4
 
