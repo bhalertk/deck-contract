@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>轉帳中斷架構審查</title>
+<style>
+  /* Fixed light theme: a deck must look the same on every viewer, so no prefers-color-scheme */
+  :root {
+    color-scheme: light;
+    --paper: #F8F5EF;
+    --ink: #1F1D1A;
+    --muted: #5F584F;
+    --rule: #CFC6B8;
+    --fill: #ECE5D9;
+    --accent: #B5562F;
+    --ok-bg: #E2EDE5; --ok: #2F6B4A;
+    --warn-bg: #F5E6CB; --warn: #855610;
+    --unk-bg: #E9E4DC; --unk: #5F584F;
+    /* Offline-safe: Windows built-in first, macOS fallback. Never fall back to a Ming face
+       (PMingLiU), so headings use the same sans family in bold instead of a serif. */
+    --sans: "Microsoft JhengHei", "微軟正黑體", "PingFang TC", "Noto Sans TC", sans-serif;
+    --serif: var(--sans);
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E4DED3; color: var(--ink); font-family: var(--sans); padding: 32px 16px; }
+  .deck { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+
+  /* 1920-wide design space, scaled with container units */
+  .slide { container-type: inline-size; position: relative; aspect-ratio: 16 / 9; background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+  .frame { position: absolute; inset: 0; padding: 5.5% 6.5% 4.5%; display: grid; grid-template-rows: auto auto 1fr auto; }
+  .kicker { font-size: 1.1cqw; color: var(--muted); letter-spacing: .08em; font-weight: 600; }
+  .title { font-family: var(--serif); font-size: 3.1cqw; line-height: 1.3; margin: 1.2cqw 0 0; font-weight: 700; max-width: 80%; }
+  .title, h3 { word-break: keep-all; overflow-wrap: anywhere; }
+  .nb { white-space: nowrap; }
+  .viz { min-height: 0; display: flex; align-items: center; padding: 2cqw 0 1cqw; }
+  .viz > * { width: 100%; }
+  .viz svg { height: 100%; max-height: 100%; display: block; }
+  .footer { display: flex; justify-content: space-between; font-size: 1cqw; color: var(--muted); }
+  .caption { font-size: 1.4cqw; color: var(--muted); margin: .8cqw 0 0; }
+
+  svg text { font-family: var(--sans); }
+  svg .serif { font-family: var(--serif); }
+
+  /* Tables carry comparison better than prose */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 1.6cqw; }
+  .tbl th { text-align: left; font-size: 1.15cqw; color: var(--muted); font-weight: 600; letter-spacing: .04em; padding: 0 1.2cqw 1cqw 0; border-bottom: 2px solid var(--ink); }
+  .tbl td { padding: 1.5cqw 1.2cqw 1.5cqw 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .tbl td:first-child { font-weight: 600; }
+  .pill { display: inline-block; padding: .3cqw 1cqw; border-radius: 99px; font-size: 1.25cqw; font-weight: 700; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+  .pill.unk { background: var(--unk-bg); color: var(--unk); }
+  .pill.risk { background: #F3DFD4; color: var(--accent); }
+  .strong { font-family: var(--serif); font-weight: 700; font-size: 1.9cqw; }
+
+  /* 1: statement */
+  .s1 .frame { grid-template-rows: auto 1fr auto; }
+  .s1 .hero { align-self: center; }
+  .s1 .title { font-size: 4.6cqw; max-width: 82%; margin: 0; }
+  .s1 .sub { font-size: 2cqw; margin: 2.6cqw 0 0; padding-left: 1.6cqw; border-left: 4px solid var(--accent); }
+
+  /* 7: roadmap */
+  .road { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 1cqw; align-items: start; }
+  .lane .head { font-size: 1.6cqw; font-weight: 700; color: var(--ink); background: var(--fill); padding: 1cqw 2.6cqw 1cqw 1.6cqw; clip-path: polygon(0 0, calc(100% - 1.6cqw) 0, 100% 50%, calc(100% - 1.6cqw) 100%, 0 100%); }
+  .lane.now .head { background: var(--accent); color: #fff; }
+  .lane ul { margin: 1.6cqw 0 0; padding: 0 1.6cqw 0 1.6cqw; list-style: none; }
+  .lane li { font-size: 1.55cqw; line-height: 1.5; padding: .9cqw 0; border-bottom: 1px solid var(--rule); }
+  .lane .ask { margin: 1.4cqw 1.6cqw 0; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+  <!-- 1 -->
+  <section class="slide s1" aria-label="第 1 頁" data-density="LOW" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>架構審查　跨系統轉帳中斷事件　虛構素材</div>
+      <div class="hero">
+        <h1 class="title">沒有帳務錯誤，是因為補償機制，不是因為架構可靠。</h1>
+        <p class="sub">根本風險是三個系統共用一個 MQ 叢集。</p>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>1 / 7</span></div>
+    </div>
+  </section>
+
+  <!-- 2: impact as a table -->
+  <section class="slide s2" aria-label="第 2 頁" data-density="HIGH" data-energy="FOCUSED" data-energy-override="事件經過與根因需要連續說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>01　影響</div>
+      <div>
+        <h2 class="title">轉帳暫停 <span class="nb">38 分鐘</span>，帳務沒有錯誤，通知延遲最久。</h2>
+        <p class="caption">10:12 至 10:50，臨櫃與網路銀行同時受影響</p>
+      </div>
+      <div class="viz">
+        <table class="tbl">
+          <thead><tr><th>系統</th><th>補償機制</th><th>結果</th></tr></thead>
+          <tbody>
+            <tr><td>轉帳服務</td><td></td><td><span class="strong">約 3,400 筆</span>　交易延遲處理</td></tr>
+            <tr><td>帳務核心</td><td><span class="pill ok">有</span></td><td><span class="strong">0 筆</span>　遺失或重複扣款</td></tr>
+            <tr><td>通知服務</td><td><span class="pill risk">沒有</span></td><td><span class="strong">約 600 則</span>　延遲超過 1 小時</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>2 / 7</span></div>
+    </div>
+  </section>
+
+  <!-- 3: proportional timeline -->
+  <section class="slide s3" aria-label="第 3 頁" data-density="HIGH" data-energy="FOCUSED" data-energy-override="時間軸需要連續說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>02　時間軸</div>
+      <h2 class="title">確認問題在 MQ 之後，又花了 <span class="nb">23 分鐘</span>才完成切換。</h2>
+      <div class="viz">
+        <!-- x = 40 + minutes after 10:10 * 34.4 -->
+        <svg viewBox="0 0 1632 560" role="img" aria-label="10:12 到 10:50 的事件時間軸，切換備援花了 23 分鐘">
+          <rect x="108.8" y="60" width="309.6" height="96" fill="var(--fill)"/>
+          <text x="263.6" y="100" text-anchor="middle" font-size="28" font-weight="700" fill="var(--ink)">定位問題</text>
+          <text x="263.6" y="136" text-anchor="middle" font-size="26" fill="var(--ink)">9 分鐘</text>
+          <rect x="418.4" y="60" width="791.2" height="96" fill="var(--accent)"/>
+          <text x="814" y="118" text-anchor="middle" font-size="34" font-weight="700" fill="#fff">切換備援 23 分鐘</text>
+          <rect x="1209.6" y="60" width="206.4" height="96" fill="var(--fill)"/>
+          <text x="1312.8" y="100" text-anchor="middle" font-size="28" font-weight="700" fill="var(--ink)">消化積壓</text>
+          <text x="1312.8" y="136" text-anchor="middle" font-size="26" fill="var(--ink)">6 分鐘</text>
+
+          <line x1="40" y1="230" x2="1588" y2="230" stroke="var(--ink)" stroke-width="3"/>
+          <g stroke="var(--rule)" stroke-width="2">
+            <line x1="40" y1="222" x2="40" y2="238"/><line x1="212" y1="222" x2="212" y2="238"/><line x1="384" y1="222" x2="384" y2="238"/>
+            <line x1="556" y1="222" x2="556" y2="238"/><line x1="728" y1="222" x2="728" y2="238"/><line x1="900" y1="222" x2="900" y2="238"/>
+            <line x1="1072" y1="222" x2="1072" y2="238"/><line x1="1244" y1="222" x2="1244" y2="238"/><line x1="1416" y1="222" x2="1416" y2="238"/><line x1="1588" y1="222" x2="1588" y2="238"/>
+          </g>
+
+          <g stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 6">
+            <line x1="108.8" y1="156" x2="108.8" y2="290"/>
+            <line x1="212" y1="230" x2="212" y2="410"/>
+            <line x1="418.4" y1="156" x2="418.4" y2="290"/>
+            <line x1="1209.6" y1="156" x2="1209.6" y2="290"/>
+            <line x1="1416" y1="156" x2="1416" y2="410"/>
+          </g>
+          <line x1="728" y1="156" x2="728" y2="410" stroke="var(--accent)" stroke-width="3"/>
+
+          <g fill="var(--ink)">
+            <circle cx="108.8" cy="230" r="10"/><circle cx="212" cy="230" r="10"/><circle cx="418.4" cy="230" r="10"/>
+            <circle cx="1209.6" cy="230" r="10"/><circle cx="1416" cy="230" r="10"/>
+          </g>
+          <circle cx="728" cy="230" r="13" fill="var(--accent)"/>
+
+          <g font-size="26" fill="var(--ink)">
+            <text x="96" y="330" class="serif" font-size="34" font-weight="700">10:12</text><text x="96" y="370">磁碟用盡</text>
+            <text x="200" y="450" class="serif" font-size="34" font-weight="700">10:15</text><text x="200" y="490">監控告警</text>
+            <text x="406" y="330" class="serif" font-size="34" font-weight="700">10:21</text><text x="406" y="370">確認是 MQ</text>
+            <text x="1197" y="330" class="serif" font-size="34" font-weight="700">10:44</text><text x="1197" y="370">手動切換完成</text>
+            <text x="1404" y="450" class="serif" font-size="34" font-weight="700">10:50</text><text x="1404" y="490">交易恢復</text>
+          </g>
+          <g fill="var(--accent)" font-size="26">
+            <text x="716" y="450" class="serif" font-size="34" font-weight="700">10:30</text><text x="716" y="490" font-weight="700">發現自動切換被關閉</text>
+          </g>
+        </svg>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>3 / 7</span></div>
+    </div>
+  </section>
+
+  <!-- 4: architecture -->
+  <section class="slide s4" aria-label="第 4 頁" data-density="MEDIUM" data-energy="FOCUSED" data-energy-override="依賴關係是根因的前提">
+    <div class="frame">
+      <div class="kicker" data-chrome>03　依賴關係</div>
+      <h2 class="title">三個系統共用同一個 <span class="nb">MQ 叢集</span>，叢集停擺就同時影響三者。</h2>
+      <div class="viz">
+        <svg viewBox="0 0 1632 560" role="img" aria-label="轉帳服務、帳務核心、通知服務都連到同一個 MQ 叢集；主節點停擺，備援節點的自動切換被關閉">
+          <g stroke="var(--ink)" stroke-width="4" fill="none">
+            <path d="M380 80 C 500 80, 500 200, 640 200"/>
+            <path d="M380 280 L 640 280"/>
+            <path d="M380 480 C 500 480, 500 380, 640 380"/>
+          </g>
+          <g fill="var(--paper)" stroke="var(--ink)" stroke-width="3">
+            <rect x="20" y="20" width="360" height="120" rx="10"/>
+            <rect x="20" y="220" width="360" height="120" rx="10"/>
+            <rect x="20" y="420" width="360" height="120" rx="10"/>
+          </g>
+          <g text-anchor="middle" fill="var(--ink)">
+            <text x="200" y="93" font-size="38" font-weight="700">轉帳服務</text>
+            <text x="200" y="272" font-size="38" font-weight="700">帳務核心</text>
+            <text x="200" y="316" font-size="26" font-weight="700" fill="var(--ok)">有交易補償</text>
+            <text x="200" y="472" font-size="38" font-weight="700">通知服務</text>
+            <text x="200" y="516" font-size="26" font-weight="700" fill="var(--accent)">沒有補償</text>
+          </g>
+
+          <rect x="640" y="30" width="560" height="500" rx="14" fill="var(--fill)" stroke="var(--ink)" stroke-width="3" stroke-dasharray="12 8"/>
+          <text x="920" y="84" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)">MQ 叢集，三個系統共用</text>
+          <rect x="690" y="120" width="460" height="170" rx="10" fill="var(--accent)"/>
+          <text x="920" y="196" text-anchor="middle" font-size="38" font-weight="700" fill="#fff">主節點</text>
+          <text x="920" y="246" text-anchor="middle" font-size="28" fill="#fff">磁碟用盡，停止接收訊息</text>
+          <rect x="690" y="320" width="460" height="170" rx="10" fill="var(--paper)" stroke="var(--muted)" stroke-width="3" stroke-dasharray="10 8"/>
+          <text x="920" y="396" text-anchor="middle" font-size="36" font-weight="700" fill="var(--muted)">備援節點</text>
+          <text x="920" y="446" text-anchor="middle" font-size="28" fill="var(--muted)">自動切換被關閉，沒有接手</text>
+
+          <g fill="var(--ink)">
+            <text x="1250" y="240" font-size="38" font-weight="700" class="serif">單點故障</text>
+            <text x="1250" y="296" font-size="28">主節點停擺、備援沒接手，</text>
+            <text x="1250" y="340" font-size="28">三個系統同時中斷。</text>
+          </g>
+        </svg>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>4 / 7</span></div>
+    </div>
+  </section>
+
+  <!-- 5: cause and effect -->
+  <section class="slide s5" aria-label="第 5 頁" data-density="HIGH" data-energy="FOCUSED" data-energy-override="根因需要接續依賴關係說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>04　根因</div>
+      <h2 class="title">兩個設定疏失讓中斷發生且拖長，共用叢集讓影響擴大。</h2>
+      <div class="viz">
+        <svg viewBox="0 0 1632 560" role="img" aria-label="因果鏈：磁碟使用率上升、主節點停擺、中斷 38 分鐘、三個系統同時受影響，以及三個造成問題的因素">
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="var(--ink)"/>
+            </marker>
+          </defs>
+
+          <!-- factor cards above each arrow -->
+          <g>
+            <rect x="240" y="10" width="340" height="170" rx="10" fill="var(--paper)" stroke="var(--rule)" stroke-width="2"/>
+            <text x="410" y="52" text-anchor="middle" font-size="24" font-weight="700" fill="var(--muted)">沒能預防</text>
+            <text x="410" y="100" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)">告警寄到停用的信箱</text>
+            <text x="410" y="146" text-anchor="middle" font-size="24" fill="var(--muted)">門檻設在 95%</text>
+
+            <rect x="646" y="10" width="340" height="170" rx="10" fill="var(--paper)" stroke="var(--rule)" stroke-width="2"/>
+            <text x="816" y="52" text-anchor="middle" font-size="24" font-weight="700" fill="var(--muted)">拖長中斷</text>
+            <text x="816" y="100" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)">自動切換被關閉</text>
+            <text x="816" y="146" text-anchor="middle" font-size="24" fill="var(--muted)">升級後沒有檢查</text>
+
+            <rect x="1052" y="10" width="340" height="170" rx="10" fill="#F3DFD4" stroke="var(--accent)" stroke-width="3"/>
+            <text x="1222" y="52" text-anchor="middle" font-size="24" font-weight="700" fill="var(--accent)">擴大影響</text>
+            <text x="1222" y="100" text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)">三個系統共用叢集</text>
+            <text x="1222" y="146" text-anchor="middle" font-size="24" fill="var(--ink)">前兩項修正後仍存在</text>
+          </g>
+          <g stroke="var(--rule)" stroke-width="2" stroke-dasharray="5 6">
+            <line x1="410" y1="180" x2="410" y2="330"/><line x1="816" y1="180" x2="816" y2="330"/>
+          </g>
+          <line x1="1222" y1="180" x2="1222" y2="330" stroke="var(--accent)" stroke-width="3"/>
+
+          <!-- state chain -->
+          <g fill="var(--fill)" stroke="var(--ink)" stroke-width="3">
+            <rect x="20" y="260" width="300" height="150" rx="10"/>
+            <rect x="500" y="260" width="230" height="150" rx="10"/>
+            <rect x="902" y="260" width="230" height="150" rx="10"/>
+          </g>
+          <rect x="1310" y="260" width="300" height="150" rx="10" fill="var(--accent)"/>
+          <g stroke="var(--ink)" stroke-width="4" marker-end="url(#arrow)">
+            <line x1="320" y1="335" x2="494" y2="335"/>
+            <line x1="730" y1="335" x2="896" y2="335"/>
+            <line x1="1132" y1="335" x2="1304" y2="335"/>
+          </g>
+          <g text-anchor="middle" font-size="30" font-weight="700" fill="var(--ink)">
+            <text x="170" y="324">磁碟使用率</text><text x="170" y="366">持續上升</text>
+            <text x="615" y="324">主節點</text><text x="615" y="366">停擺</text>
+            <text x="1017" y="324">中斷</text><text x="1017" y="366">38 分鐘</text>
+          </g>
+          <g text-anchor="middle" font-size="30" font-weight="700" fill="#fff">
+            <text x="1460" y="324">三個系統</text><text x="1460" y="366">同時受影響</text>
+          </g>
+        </svg>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>5 / 7</span></div>
+    </div>
+  </section>
+
+  <!-- 6: confirmed vs open as a table -->
+  <section class="slide s6" aria-label="第 6 頁" data-density="HIGH" data-energy="FOCUSED" data-energy-override="確認範圍需在決策前說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>05　確認範圍</div>
+      <h2 class="title">帳務正確性已確認，備援盤點與拆分工時還沒有結論。</h2>
+      <div class="viz">
+        <table class="tbl">
+          <thead><tr><th>項目</th><th>狀態</th><th>依據或下一步</th></tr></thead>
+          <tbody>
+            <tr><td>沒有遺失或重複扣款</td><td><span class="pill ok">已驗證</span></td><td>已比對帳務紀錄</td></tr>
+            <tr><td>約 600 則通知延遲</td><td><span class="pill ok">已驗證</span></td><td></td></tr>
+            <tr><td>其他系統是否也關閉了自動切換</td><td><span class="pill unk">未知</span></td><td>盤點中</td></tr>
+            <tr><td>拆分 <span class="nb">MQ 叢集</span>所需工時</td><td><span class="pill warn">推測</span></td><td>初估 6 到 8 週</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>6 / 7</span></div>
+    </div>
+  </section>
+
+  <!-- 7: decision roadmap -->
+  <section class="slide s7" aria-label="第 7 頁" data-density="MEDIUM" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>06　請求決議</div>
+      <h2 class="title">請核准三項立即修正，並把 <span class="nb">MQ 叢集</span>拆分排入評估。</h2>
+      <div class="viz">
+        <div class="road">
+          <div class="lane now">
+            <div class="head">立即</div>
+            <ul><li>修正告警收件人</li><li>恢復自動切換設定</li><li>把以上兩項加入升級檢查清單</li></ul>
+            <div class="ask"><span class="pill risk">請核准</span></div>
+          </div>
+          <div class="lane">
+            <div class="head">短期</div>
+            <ul><li>盤點其他系統的備援設定</li></ul>
+          </div>
+          <div class="lane">
+            <div class="head">中期</div>
+            <ul><li>把轉帳服務的訊息通道與其他系統拆開</li><li>初估 6 到 8 週　<span class="pill warn">推測</span></li></ul>
+            <div class="ask"><span class="pill risk">請排入評估</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>7 / 7</span></div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

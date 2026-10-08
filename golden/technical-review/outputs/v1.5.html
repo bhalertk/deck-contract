@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>轉帳中斷架構審查</title>
+<style>
+  /* Tokens: same system as the other golden decks */
+  :root {
+    --paper: #F7F3EC;
+    --ink: #2E2A25;
+    --muted: #7A7268;
+    --rule: #D9D1C4;
+    --accent: #B5562F;
+    --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+    --sans: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #1F1C18; --ink: #EDE7DC; --muted: #A39A8C; --rule: #3A352E; --accent: #D9825B; }
+  }
+  :root[data-theme="dark"] { --paper: #1F1C18; --ink: #EDE7DC; --muted: #A39A8C; --rule: #3A352E; --accent: #D9825B; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E9E3D8; color: var(--ink); font-family: var(--sans); padding: 32px 16px; }
+  .deck { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+
+  /* 1920-wide design space, scaled with container units */
+  .slide { container-type: inline-size; position: relative; aspect-ratio: 16 / 9; background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06); overflow: hidden; }
+  /* M-F dark narrative break */
+  .slide.dark { --paper: #2E2A25; --ink: #F3EEE6; --muted: #B8AE9F; --rule: #4A443C; --accent: #E08A62; }
+  .frame { position: absolute; inset: 0; padding: 6.5% 7.5%; display: flex; flex-direction: column; }
+  .kicker { font-size: 1.05cqw; color: var(--muted); letter-spacing: .08em; }
+  .title { font-family: var(--serif); font-size: 3.2cqw; line-height: 1.3; margin: 2cqw 0 0; font-weight: 600; max-width: 72%; }
+  .footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 1cqw; color: var(--muted); }
+  /* Headings break at punctuation, not mid-word; still wrap if a clause cannot fit */
+  .title, h3 { word-break: keep-all; overflow-wrap: anywhere; }
+  .nb { white-space: nowrap; }
+  .muted { color: var(--muted); }
+
+  /* 1: statement at editorial scale (M-A) */
+  .s1 .title { font-size: 4.6cqw; max-width: 80%; margin-top: auto; }
+  .s1 .sub { font-size: 1.9cqw; margin: 2.4cqw 0 0; padding-top: 2cqw; border-top: 2px solid var(--accent); max-width: 60%; }
+
+  /* 2: evidence split 65/35 (M-D) */
+  .s2 .split { display: grid; grid-template-columns: 65fr 35fr; gap: 5cqw; margin-top: auto; align-items: end; }
+  .s2 .big { font-family: var(--serif); font-size: 10cqw; line-height: 1; margin: 0; font-weight: 600; color: var(--accent); }
+  .s2 .big small { font-size: 2.4cqw; color: var(--ink); font-family: var(--sans); margin-left: 1cqw; }
+  .s2 .when { font-size: 1.3cqw; color: var(--muted); margin: 1cqw 0 2.4cqw; }
+  .s2 .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.4cqw; }
+  .s2 .facts div { border-top: 1px solid var(--rule); padding-top: 1.2cqw; font-size: 1.3cqw; line-height: 1.6; }
+  .s2 .facts b { display: block; font-family: var(--serif); font-size: 2.4cqw; font-weight: 600; }
+  .s2 .read { font-size: 1.45cqw; line-height: 1.8; border-left: 2px solid var(--rule); padding-left: 2cqw; margin: 0; }
+
+  /* 3: timeline on one directional rule (M-B) */
+  .s3 .line { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.6cqw; margin-top: auto; padding-top: 2.4cqw; border-top: 2px solid var(--rule); }
+  .s3 .step { font-size: 1.2cqw; line-height: 1.65; }
+  .s3 .step time { display: block; font-family: var(--serif); font-size: 1.9cqw; font-weight: 600; margin-bottom: .6cqw; }
+  .s3 .step.key time, .s3 .step.key { color: var(--accent); }
+
+  /* 4: hub dependency, broken symmetry (M-G) */
+  .s4 .body { display: grid; grid-template-columns: 60fr 40fr; gap: 4cqw; margin-top: auto; align-items: center; }
+  .s4 svg { width: 100%; height: auto; display: block; }
+  .s4 .read { font-size: 1.45cqw; line-height: 1.8; margin: 0; }
+
+  /* 5: three causes, unequal weight (M-G) */
+  .s5 .causes { display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 3.4cqw; margin-top: auto; }
+  .s5 .cause { border-top: 1px solid var(--rule); padding-top: 1.4cqw; }
+  .s5 .cause h3 { font-family: var(--serif); font-weight: 600; font-size: 1.7cqw; margin: 0 0 1cqw; }
+  .s5 .cause p { font-size: 1.25cqw; line-height: 1.75; margin: 0; }
+  .s5 .cause.main { border-top: 3px solid var(--accent); }
+  .s5 .cause.main h3 { font-size: 2.4cqw; }
+  .s5 .cause.main p { font-size: 1.45cqw; }
+
+  /* 6: confirmed vs open, labelled in words (3.11) */
+  .s6 .rows { margin-top: auto; }
+  .s6 .row { display: grid; grid-template-columns: 12cqw 1fr; gap: 2cqw; padding: 1.5cqw 0; border-top: 1px solid var(--rule); font-size: 1.45cqw; }
+  .s6 .row:last-child { border-bottom: 1px solid var(--rule); }
+  .s6 .tag { font-size: 1.15cqw; color: var(--muted); letter-spacing: .06em; padding-top: .2cqw; }
+  .s6 .tag.open { color: var(--accent); }
+
+  /* 7: decision (M-F) */
+  .s7 .title { font-size: 3.8cqw; }
+  .s7 .horizons { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3.4cqw; margin-top: auto; }
+  .s7 .h { border-top: 1px solid var(--rule); padding-top: 1.4cqw; font-size: 1.35cqw; line-height: 1.75; }
+  .s7 .h b { display: block; font-size: 1.15cqw; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin-bottom: .6cqw; }
+  .s7 .h.now { border-top: 3px solid var(--accent); }
+  .s7 .h.now b { color: var(--accent); }
+</style>
+</head>
+<body>
+<main class="deck">
+
+  <section class="slide s1" aria-label="第 1 頁" data-density="LOW" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>架構審查　跨系統轉帳中斷事件　虛構素材</div>
+      <h1 class="title">沒有帳務錯誤，是因為補償機制，不是因為架構可靠。</h1>
+      <p class="sub">根本風險是三個系統共用一個 MQ 叢集。</p>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>1 / 7</span></div>
+    </div>
+  </section>
+
+  <section class="slide s2" aria-label="第 2 頁" data-density="MEDIUM" data-energy="FOCUSED" data-energy-override="事件經過與根因需要連續說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>01　影響</div>
+      <h2 class="title">轉帳暫停 <span class="nb">38 分鐘</span>，帳務沒有錯誤，通知延遲最久。</h2>
+      <div class="split">
+        <div>
+          <p class="big">38<small>分鐘</small></p>
+          <p class="when">10:12 至 10:50，臨櫃與網路銀行同時受影響</p>
+          <div class="facts">
+            <div><b>約 3,400 筆</b>交易延遲處理</div>
+            <div><b>0 筆</b>遺失或重複扣款</div>
+            <div><b>約 600 則</b>通知延遲超過 1 小時</div>
+          </div>
+        </div>
+        <p class="read">差別在補償機制：帳務核心有，通知服務沒有。</p>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>2 / 7</span></div>
+    </div>
+  </section>
+
+  <section class="slide s3" aria-label="第 3 頁" data-density="HIGH" data-energy="FOCUSED" data-energy-override="時間軸需要連續說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>02　時間軸</div>
+      <h2 class="title">確認問題在 MQ 之後，又花了 <span class="nb">23 分鐘</span>才完成切換。</h2>
+      <div class="line">
+        <div class="step"><time>10:12</time>主節點磁碟用盡，停止接收訊息</div>
+        <div class="step"><time>10:15</time>轉帳服務逾時，監控發出告警</div>
+        <div class="step"><time>10:21</time>確認問題在 MQ，不在轉帳服務</div>
+        <div class="step key"><time>10:30</time>切換時發現自動切換已被關閉</div>
+        <div class="step"><time>10:44</time>手動完成切換，開始消化積壓訊息</div>
+        <div class="step"><time>10:50</time>積壓處理完畢，交易恢復</div>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>3 / 7</span></div>
+    </div>
+  </section>
+
+  <section class="slide s4" aria-label="第 4 頁" data-density="MEDIUM" data-energy="FOCUSED" data-energy-override="依賴關係是根因的前提">
+    <div class="frame">
+      <div class="kicker" data-chrome>03　依賴關係</div>
+      <h2 class="title">三個系統共用同一個 <span class="nb">MQ 叢集</span>，叢集停擺就同時影響三者。</h2>
+      <div class="body">
+        <svg viewBox="0 0 900 380" role="img" aria-label="轉帳服務、帳務核心、通知服務都連到同一個 MQ 叢集">
+          <g stroke="var(--rule)" stroke-width="3">
+            <line x1="200" y1="70" x2="560" y2="190"/>
+            <line x1="200" y1="190" x2="560" y2="190"/>
+            <line x1="200" y1="310" x2="560" y2="190"/>
+          </g>
+          <g font-family="var(--sans)" font-size="28" fill="var(--ink)">
+            <rect x="10" y="40" width="200" height="60" rx="4" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+            <text x="110" y="80" text-anchor="middle">轉帳服務</text>
+            <rect x="10" y="160" width="200" height="60" rx="4" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+            <text x="110" y="200" text-anchor="middle">帳務核心</text>
+            <text x="110" y="250" text-anchor="middle" font-size="22" fill="var(--muted)">有交易補償</text>
+            <rect x="10" y="280" width="200" height="60" rx="4" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+            <text x="110" y="320" text-anchor="middle">通知服務</text>
+            <text x="110" y="370" text-anchor="middle" font-size="22" fill="var(--muted)">沒有補償</text>
+          </g>
+          <circle cx="680" cy="190" r="120" fill="var(--accent)"/>
+          <text x="680" y="200" text-anchor="middle" font-family="var(--serif)" font-size="40" font-weight="600" fill="var(--paper)">MQ 叢集</text>
+        </svg>
+        <p class="read">這次帳務沒有出錯，靠的是帳務核心自己的補償機制。通知服務沒有補償，所以延遲最久。</p>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>4 / 7</span></div>
+    </div>
+  </section>
+
+  <section class="slide s5" aria-label="第 5 頁" data-density="HIGH" data-energy="FOCUSED" data-energy-override="根因需要接續依賴關係說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>04　根因</div>
+      <h2 class="title">兩個設定疏失讓中斷拖長，共用叢集讓影響擴大。</h2>
+      <div class="causes">
+        <div class="cause">
+          <h3>告警寄到停用的信箱</h3>
+          <p>磁碟告警門檻設在 95%，但收件人是已停用的信箱。</p>
+        </div>
+        <div class="cause">
+          <h3>自動切換被關閉</h3>
+          <p>升級後設定被關閉，升級檢查清單沒有這一項。</p>
+        </div>
+        <div class="cause main">
+          <h3>三個系統共用一個叢集</h3>
+          <p>前兩項修正後，叢集停擺時三個系統仍會同時受影響。這是結構問題，不是設定問題。</p>
+        </div>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>5 / 7</span></div>
+    </div>
+  </section>
+
+  <section class="slide s6" aria-label="第 6 頁" data-density="MEDIUM" data-energy="FOCUSED" data-energy-override="確認範圍需在決策前說明">
+    <div class="frame">
+      <div class="kicker" data-chrome>05　確認範圍</div>
+      <h2 class="title">帳務正確性已確認，備援盤點與拆分工時還沒有結論。</h2>
+      <div class="rows">
+        <div class="row"><span class="tag">已驗證</span><span>沒有遺失或重複扣款，已比對帳務紀錄</span></div>
+        <div class="row"><span class="tag">已驗證</span><span>約 600 則通知延遲</span></div>
+        <div class="row"><span class="tag open">未知</span><span>其他系統是否也關閉了自動切換，盤點中</span></div>
+        <div class="row"><span class="tag open">推測</span><span>拆分 MQ 叢集初估 6 到 8 週</span></div>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>6 / 7</span></div>
+    </div>
+  </section>
+
+  <section class="slide s7 dark" aria-label="第 7 頁" data-density="MEDIUM" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>06　請求決議</div>
+      <h2 class="title">請核准三項立即修正，並把 <span class="nb">MQ 叢集</span>拆分排入評估。</h2>
+      <div class="horizons">
+        <div class="h now"><b>立即</b>修正告警收件人，恢復自動切換設定，並把這兩項加入升級檢查清單。</div>
+        <div class="h"><b>短期</b>盤點其他系統的備援設定。</div>
+        <div class="h"><b>中期</b>把轉帳服務的訊息通道與其他系統拆開。</div>
+      </div>
+      <div class="footer" data-chrome><span>架構審查委員會</span><span>7 / 7</span></div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

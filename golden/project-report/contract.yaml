@@ -1,0 +1,68 @@
+# 虛構素材，僅供測試。事實只能來自 source.md。
+deck_id: golden-project-report
+language: zh-Hant
+voice: project-report
+audience:
+  type: internal-management
+  description: 部門主管與風控同仁，關心責任歸屬與人力成本
+goal:
+  type: decide
+  outcome: 同意擴大試辦，但只限於初步整理這一步
+core_message: 模型可以協助審查，但不能代替承辦人做決定
+constraints:
+  time_min: 10
+  slide_count_max: 3
+  technical_depth: mid
+must_include:
+  - 量測口徑
+  - 模型目前的能力邊界
+must_avoid:
+  - 把系統處理時間當成人力節省
+canon_overrides: []
+
+slides:
+  - intent: 說明試辦做法與我的判斷
+    takeaway: 值得擴大試辦，但只限於初步整理
+    pattern: P01
+    density: LOW
+    energy: FOCUSED
+    motif: M-H
+    visual_rationale: 開場以判斷為主，不需要大型視覺，以留白與一條分隔線帶出例會中的提問
+    evidence: []
+
+  - intent: 用人力時間證明效益
+    takeaway: 每份文件的人工審查時間從 190 分鐘降到 65 分鐘
+    pattern: P08
+    density: MEDIUM
+    energy: BOLD
+    motif: M-A
+    evidence:
+      - claim: 人工審查時間從 190 分鐘降到 65 分鐘，下降約 66%
+        source: R-012、R-013
+        calculation: (190 - 65) / 190
+        basis: 200 份文件，實際作業時間，不含排隊等待
+        status: 已驗證
+      - claim: 模型初步整理 42 分鐘，不佔承辦人人力
+        source: R-014
+        calculation: 無
+        basis: 系統處理時間
+        status: 已驗證
+
+  - intent: 說明模型的能力邊界與處理方式
+    takeaway: 條款引用可以交給模型，手寫註記和新型態契約還不行
+    pattern: P11
+    density: MEDIUM
+    energy: FOCUSED
+    motif: M-G
+    visual_rationale: 三欄的重要性不對等，強調影響決策的「已發現的問題」
+    evidence:
+      - claim: 200 份樣本中沒有發現條款引用錯誤
+        source: T-021
+        calculation: 無
+        basis: 200 份測試樣本
+        status: 已驗證
+      - claim: 手寫註記經常被漏掉
+        source: T-022
+        calculation: 7 份中 4 份
+        basis: 7 份含手寫註記的文件
+        status: 推測

@@ -1,0 +1,24 @@
+# 虛構素材，僅供測試。事實只能來自 source.md。
+deck_id: golden-education
+language: zh-Hant
+voice: education
+audience:
+  type: developers
+  description: 還沒開始使用 AI 程式助手的開發同仁，擔心資料規範與產出品質
+goal:
+  type: adopt
+  outcome: 同仁知道可以從哪裡開始，以及哪些事情不能做
+core_message: 從解釋舊程式碼和寫測試初稿開始，產出一律自己確認，客戶資料一律不輸入
+constraints:
+  time_min: 15
+  slide_count_max: 6
+  technical_depth: mid
+must_include:
+  - 使用規範
+  - 同仁的實際經驗，包括出錯的例子
+must_avoid:
+  - 誇大效果
+  - 把自評的節省時間當成量測結果
+canon_overrides: []
+
+# Slide Contract 由產生器依 DESIGN.md 第 1.3 節撰寫，此處只固定 Deck Contract。

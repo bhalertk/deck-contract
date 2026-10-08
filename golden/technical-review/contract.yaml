@@ -1,0 +1,27 @@
+# 虛構素材，僅供測試。事實只能來自 source.md。
+deck_id: golden-technical-review
+language: zh-Hant
+voice: technical-review
+audience:
+  type: architecture-review-board
+  description: 架構審查委員與各系統負責人，熟悉 MQ 與交易補償
+goal:
+  type: decide
+  outcome: 核准立即修正項目，並排入 MQ 叢集拆分的評估
+core_message: 這次沒有造成帳務錯誤是因為補償機制，不是因為架構可靠；三個系統共用 MQ 叢集是單點故障
+constraints:
+  time_min: 20
+  slide_count_max: 8
+  technical_depth: high
+must_include:
+  - 時間軸
+  - 依賴關係
+  - 已確認與尚未確認的事項
+must_avoid:
+  - 把責任歸給個人
+  - 把「沒有遺失交易」說成架構沒有問題
+canon_overrides:
+  - id: C14
+    reason: 時間軸與根因需要連續說明，插入 BOLD 頁會打斷推理
+
+# Slide Contract 由產生器依 DESIGN.md 第 1.3 節撰寫，此處只固定 Deck Contract。

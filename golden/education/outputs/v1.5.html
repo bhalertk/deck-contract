@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 程式助手入門</title>
+<style>
+  /* Tokens: same system as the other golden decks */
+  :root {
+    --paper: #F7F3EC;
+    --ink: #2E2A25;
+    --muted: #7A7268;
+    --rule: #D9D1C4;
+    --accent: #B5562F;
+    --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+    --sans: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #1F1C18; --ink: #EDE7DC; --muted: #A39A8C; --rule: #3A352E; --accent: #D9825B; }
+  }
+  :root[data-theme="dark"] { --paper: #1F1C18; --ink: #EDE7DC; --muted: #A39A8C; --rule: #3A352E; --accent: #D9825B; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E9E3D8; color: var(--ink); font-family: var(--sans); padding: 32px 16px; }
+  .deck { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+
+  /* 1920-wide design space, scaled with container units */
+  .slide { container-type: inline-size; position: relative; aspect-ratio: 16 / 9; background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06); overflow: hidden; }
+  .frame { position: absolute; inset: 0; padding: 6.5% 7.5%; display: flex; flex-direction: column; }
+  .kicker { font-size: 1.05cqw; color: var(--muted); letter-spacing: .08em; }
+  .title { font-family: var(--serif); font-size: 3.4cqw; line-height: 1.3; margin: 2cqw 0 0; font-weight: 600; max-width: 70%; }
+  .footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 1cqw; color: var(--muted); }
+  /* Headings break at punctuation, not mid-word; still wrap if a clause cannot fit */
+  .title, h3 { word-break: keep-all; overflow-wrap: anywhere; }
+  .nb { white-space: nowrap; }
+  .body { font-size: 1.55cqw; line-height: 1.85; max-width: 52%; margin: 2.4cqw 0 0; }
+  .src { font-size: 1.05cqw; color: var(--muted); margin: 0; }
+
+  /* 1: opening, framed by whitespace and one rule (M-H) */
+  .s1 .title { font-size: 4.2cqw; margin-top: auto; }
+  .s1 .body { border-top: 2px solid var(--accent); padding-top: 2cqw; }
+
+  /* 2: two worries at editorial scale (M-A) */
+  .s2 .worries { display: grid; grid-template-columns: 1fr 1fr; gap: 5cqw; margin-top: auto; }
+  .s2 .worry { font-family: var(--serif); font-size: 3cqw; line-height: 1.35; font-weight: 600; border-top: 1px solid var(--rule); padding-top: 1.6cqw; margin: 0; word-break: keep-all; }
+  .s2 .after { font-size: 1.5cqw; margin: 3cqw 0 1.4cqw; }
+
+  /* 3: one rule dominates, the others recede (M-A) */
+  .s3 .big { font-family: var(--serif); font-size: 5cqw; line-height: 1.25; font-weight: 600; margin: auto 0 0; max-width: 78%; word-break: keep-all; }
+  .s3 .big em { font-style: normal; color: var(--accent); }
+  .s3 .also { font-size: 1.5cqw; line-height: 1.8; margin: 1.6cqw 0 0; }
+  .s3 .others { display: grid; grid-template-columns: 1fr 1fr; gap: 4cqw; margin-top: 3cqw; }
+  .s3 .others p { font-size: 1.35cqw; line-height: 1.75; margin: 0; border-top: 1px solid var(--rule); padding-top: 1.2cqw; }
+
+  /* 4: a colleague's story, quoted (M-H) */
+  .s4 blockquote { margin: auto 0 0; max-width: 64%; font-family: var(--serif); font-size: 2.2cqw; line-height: 1.6; padding-left: 2.4cqw; border-left: 2px solid var(--accent); }
+  .s4 .turn { font-size: 1.55cqw; line-height: 1.8; max-width: 60%; margin: 2.4cqw 0 0; }
+
+  /* 5: three steps on one rule, the middle step keyed (M-B) */
+  .s5 .steps { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 3cqw; margin-top: auto; border-top: 2px solid var(--rule); padding-top: 2cqw; }
+  .s5 .step b { display: block; font-family: var(--serif); font-size: 2cqw; margin-bottom: .8cqw; }
+  .s5 .step { font-size: 1.4cqw; line-height: 1.75; }
+  .s5 .step.key { color: var(--accent); }
+  .s5 .step.key b { font-size: 2.4cqw; }
+  .s5 .self { font-size: 1.2cqw; color: var(--muted); margin: 2.4cqw 0 0; max-width: 60%; line-height: 1.7; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+  <section class="slide s1" aria-label="第 1 頁" data-density="LOW" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>內部教育訓練　AI 程式助手　虛構素材</div>
+      <h1 class="title">先從解釋舊程式碼<br>和寫<span class="nb">測試初稿</span>開始。</h1>
+      <p class="body">開發部門 120 位同仁中，已有 46 位在用。這份是給<span class="nb">還沒開始的你</span>。</p>
+      <div class="footer" data-chrome><span>開發部門</span><span>1 / 5</span></div>
+    </div>
+  </section>
+
+  <section class="slide s2" aria-label="第 2 頁" data-density="MEDIUM" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>為什麼還沒開始</div>
+      <h2 class="title">還沒開始的人，多半卡在兩個擔心。</h2>
+      <div class="worries">
+        <p class="worry">不確定哪些資料可以輸入</p>
+        <p class="worry">擔心產出有錯</p>
+      </div>
+      <p class="after">這兩個擔心都合理，也都有對應的做法。</p>
+      <p class="src">來源：內部調查，74 位未使用者，可複選</p>
+      <div class="footer" data-chrome><span>開發部門</span><span>2 / 5</span></div>
+    </div>
+  </section>
+
+  <section class="slide s3" aria-label="第 3 頁" data-density="MEDIUM" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>第一個擔心：資料</div>
+      <p class="big">客戶資料、帳號、交易紀錄，<em>一律不輸入。</em></p>
+      <p class="also">正式環境的設定也一樣。不確定的資料，先問資安窗口。</p>
+      <div class="others">
+        <p>產出的程式碼視同別人寫的，一樣要經過 code review 才能合併。</p>
+        <p>只用公司核准的工具和帳號。</p>
+      </div>
+      <div class="footer" data-chrome><span>開發部門</span><span>3 / 5</span></div>
+    </div>
+  </section>
+
+  <section class="slide s4" aria-label="第 4 頁" data-density="MEDIUM" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>第二個擔心：產出有錯</div>
+      <h2 class="title">它很會解釋舊程式碼，但也會解釋錯。</h2>
+      <blockquote>最有幫助的不是讓它寫新程式，而是請它解釋一段<span class="nb">十年前</span>、沒有文件的程式碼。</blockquote>
+      <p class="turn">說這句話的同仁也遇過它把欄位用途解釋錯，後來對照資料表才發現。</p>
+      <div class="footer" data-chrome><span>開發部門</span><span>4 / 5</span></div>
+    </div>
+  </section>
+
+  <section class="slide s5" aria-label="第 5 頁" data-density="HIGH" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>開始的方式</div>
+      <h2 class="title">先挑低風險的工作，每次都自己確認。</h2>
+      <div class="steps">
+        <div class="step"><b>挑低風險的工作</b>解釋既有程式碼，或寫單元測試初稿。</div>
+        <div class="step key"><b>每次都自己確認</b>尤其是業務邏輯。它解釋得很順，不代表是對的。</div>
+        <div class="step"><b>不確定就先不輸入</b>問資安窗口，確認後再用。</div>
+      </div>
+      <p class="self">使用者自評寫測試初稿約省一半時間。這是自評，還沒有實際量測。</p>
+      <div class="footer" data-chrome><span>開發部門</span><span>5 / 5</span></div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

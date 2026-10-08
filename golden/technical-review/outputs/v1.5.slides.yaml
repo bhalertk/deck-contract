@@ -1,0 +1,94 @@
+# 產生器依 DESIGN.md v1.5 第 1.3、1.4 節撰寫的 Slide Contract，對應 v1.5.html。
+slides:
+  - intent: 先說結論，避免聽眾把「沒有帳務錯誤」解讀成架構可靠
+    takeaway: 沒有帳務錯誤是因為補償機制，根本風險是共用 MQ 叢集
+    pattern: P02
+    density: LOW
+    energy: BOLD
+    motif: M-A
+    evidence: []
+
+  - intent: 交代影響範圍
+    takeaway: 轉帳暫停 38 分鐘，帳務沒有錯誤，通知延遲最久
+    pattern: P08
+    density: MEDIUM
+    energy: FOCUSED
+    energy_override_reason: 事件經過與根因需要連續說明
+    motif: M-D
+    evidence:
+      - claim: 暫停 38 分鐘，10:12 至 10:50
+        source: E-001
+        calculation: 10:50 - 10:12
+        basis: 交易暫停的起訖時間
+        status: 已驗證
+      - claim: 約 3,400 筆延遲，0 筆遺失或重複扣款
+        source: E-003
+        calculation: 無
+        basis: 受影響交易筆數，已比對帳務紀錄
+        status: 已驗證
+      - claim: 約 600 則通知延遲超過 1 小時
+        source: 依賴關係段落
+        calculation: 無
+        basis: 通知服務送出時間
+        status: 已驗證
+
+  - intent: 說明時間花在哪裡
+    takeaway: 確認問題在 MQ 之後，又花了 23 分鐘才完成切換
+    pattern: P05
+    density: HIGH
+    energy: FOCUSED
+    energy_override_reason: 時間軸需要連續說明
+    motif: M-B
+    evidence:
+      - claim: 確認問題後 23 分鐘才完成切換
+        source: 時間軸第 3、5 步
+        calculation: 10:44 - 10:21
+        basis: 時間軸紀錄
+        status: 已驗證
+
+  - intent: 說明為什麼影響會同時擴及三個系統
+    takeaway: 三個系統共用同一個 MQ 叢集，叢集停擺就同時影響三者
+    pattern: P06
+    density: MEDIUM
+    energy: FOCUSED
+    energy_override_reason: 依賴關係是根因的前提
+    motif: M-G
+    visual_rationale: 這是中心輻射的關係，依 P06 不使用 M-B；以不對稱的大型節點突出 MQ 叢集的集中風險
+    evidence: []
+
+  - intent: 區分設定疏失與結構問題
+    takeaway: 兩個設定疏失讓中斷拖長，共用叢集讓影響擴大
+    pattern: P03
+    density: HIGH
+    energy: FOCUSED
+    energy_override_reason: 根因需要接續依賴關係說明
+    motif: M-G
+    evidence:
+      - claim: 告警門檻 95%，收件人是已停用的信箱
+        source: 根因段落
+        calculation: 無
+        basis: 告警設定
+        status: 已驗證
+
+  - intent: 在決策前交代確認範圍
+    takeaway: 帳務正確性已確認，備援盤點與拆分工時還沒有結論
+    pattern: P13
+    density: MEDIUM
+    energy: FOCUSED
+    energy_override_reason: 確認範圍需在決策前說明
+    motif: M-H
+    visual_rationale: 四個項目重要性相近，用分隔線與文字標籤區分信心狀態，不需要非對稱雙區塊
+    evidence:
+      - claim: 拆分 MQ 叢集初估 6 到 8 週
+        source: 已確認與尚未確認的事項
+        calculation: 無
+        basis: 初估
+        status: 推測
+
+  - intent: 請求決議
+    takeaway: 核准三項立即修正，並把 MQ 叢集拆分排入評估
+    pattern: P11
+    density: MEDIUM
+    energy: BOLD
+    motif: M-F
+    evidence: []

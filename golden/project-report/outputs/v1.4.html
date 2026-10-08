@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>語氣與視覺溫度範例</title>
+<style>
+  /* Tokens: warm neutrals, one accent per slide, no external fonts */
+  :root {
+    --paper: #F7F3EC;
+    --ink: #2E2A25;
+    --muted: #7A7268;
+    --rule: #D9D1C4;
+    --accent: #B5562F;
+    --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+    --sans: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #1F1C18; --ink: #EDE7DC; --muted: #A39A8C; --rule: #3A352E; --accent: #D9825B; }
+  }
+  :root[data-theme="dark"] { --paper: #1F1C18; --ink: #EDE7DC; --muted: #A39A8C; --rule: #3A352E; --accent: #D9825B; }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #E9E3D8;
+    color: var(--ink);
+    font-family: var(--sans);
+    padding: 32px 16px;
+  }
+  .deck { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+
+  /* Each slide is laid out in a 1920-wide design space, scaled with container units */
+  .slide {
+    container-type: inline-size;
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--paper);
+    box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    overflow: hidden;
+  }
+  .frame { position: absolute; inset: 0; padding: 6.5% 7.5%; display: flex; flex-direction: column; }
+  .kicker { font-size: 1.05cqw; color: var(--muted); letter-spacing: .08em; }
+  .title { font-family: var(--serif); font-size: 3.4cqw; line-height: 1.3; margin: 2.2cqw 0 0; font-weight: 600; max-width: 66%; }
+  .body { font-size: 1.45cqw; line-height: 1.85; color: var(--ink); max-width: 48%; margin: 2.4cqw 0 0; }
+  .note { font-size: 1.1cqw; color: var(--muted); line-height: 1.7; margin: 0; }
+  .nb { white-space: nowrap; } /* keep a word or number+unit on one line */
+  .footer { margin-top: auto; display: flex; justify-content: space-between; font-size: 1cqw; color: var(--muted); }
+
+  /* Slide 1: opening, a stated position, one concrete scene */
+  .s1 .stance { font-size: 1.45cqw; line-height: 1.85; max-width: 48%; margin: 1.6cqw 0 0; }
+  .s1 .stance strong { font-weight: 600; }
+  .s1 .scene { position: absolute; right: 7.5%; top: 24%; width: 34%; font-size: 1.3cqw; color: var(--muted); line-height: 1.9; border-left: 2px solid var(--accent); padding-left: 2cqw; }
+
+  /* Slide 2: one large number as the anchor (M-A), its context beside it (C12) */
+  .s2 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6cqw; align-items: end; margin-top: auto; }
+  .s2 .big { font-family: var(--serif); font-size: 11cqw; line-height: 1; color: var(--accent); margin: 0; font-weight: 600; }
+  .s2 .big-unit { font-size: 2.4cqw; color: var(--ink); font-family: var(--sans); margin-left: 1cqw; }
+  .s2 .big-label { font-size: 1.3cqw; color: var(--muted); margin: 1.2cqw 0 0; }
+  .s2 .row { display: flex; justify-content: space-between; gap: 2cqw; padding: 1.4cqw 0; border-top: 1px solid var(--rule); font-size: 1.3cqw; }
+  .s2 .row:last-child { border-bottom: 1px solid var(--rule); }
+  .s2 .row span:first-child { color: var(--muted); }
+  .s2 .row small { display: block; font-size: 1cqw; color: var(--muted); }
+  .s2 .note { margin-top: 2.6cqw; max-width: 70%; }
+
+  /* Slide 3: three columns answer the same question, each with its confidence and decision */
+  .s3 .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4cqw; margin-top: 3.6cqw; }
+  .s3 .tag { font-size: 1.1cqw; color: var(--muted); letter-spacing: .06em; border-top: 2px solid var(--rule); padding-top: 1.3cqw; }
+  .s3 .tag.hot { border-top-color: var(--accent); color: var(--accent); }
+  .s3 .conf { font-size: 1cqw; color: var(--muted); margin-top: .5cqw; }
+  .s3 h3 { font-family: var(--serif); font-weight: 600; font-size: 1.9cqw; margin: 1.1cqw 0 .9cqw; }
+  .s3 p { font-size: 1.25cqw; line-height: 1.8; margin: 0; }
+  .s3 .decide { margin-top: 1.1cqw; font-size: 1.15cqw; color: var(--muted); line-height: 1.7; }
+</style>
+</head>
+<body>
+<main class="deck">
+
+  <section class="slide s1" aria-label="第 1 頁" data-density="LOW" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>範例內容，數字與情境均為虛構</div>
+      <h1 class="title">模型可以協助審查，但不能代替<span class="nb">承辦人</span>做決定。</h1>
+      <p class="body">這三個月，我們在文件審查流程裡試了一個做法。模型先整理條款與缺漏，承辦人再逐項確認。</p>
+      <p class="stance">我的判斷是：<strong>值得擴大試辦，但只限於初步整理這一步。</strong></p>
+      <div class="footer" data-chrome><span>程式開發組</span><span>1 / 3</span></div>
+    </div>
+    <div class="scene">上個月的例會，有人問：「如果模型讀錯了，誰負責？」答案是承辦人，所以模型只能做到承辦人能檢查的範圍。</div>
+  </section>
+
+  <section class="slide s2" aria-label="第 2 頁" data-density="MEDIUM" data-energy="BOLD">
+    <div class="frame">
+      <div class="kicker" data-chrome>人力時間</div>
+      <h2 class="title">每份文件的人工審查時間，從 <span class="nb">190 分鐘</span>降到 <span class="nb">65 分鐘</span>。</h2>
+      <div class="grid">
+        <div>
+          <p class="big">65<span class="big-unit">分鐘</span></p>
+          <p class="big-label">試辦後，承辦人每份文件的平均作業時間</p>
+        </div>
+        <div>
+          <div class="row"><span>試辦前，承辦人審查</span><span>190 分鐘</span></div>
+          <div class="row"><span>試辦後，模型初步整理<small>系統處理時間，不佔承辦人人力，但仍計入端到端時間</small></span><span>42 分鐘</span></div>
+          <div class="row"><span>試辦後，承辦人複核</span><span>65 分鐘</span></div>
+        </div>
+      </div>
+      <p class="note">量測口徑：200 份文件，每份的實際作業時間，不含排隊等待。之前常聽到的「2 天」是收件到結案的日曆時間，和這裡的作業時間不能直接比較。</p>
+      <div class="footer" data-chrome><span>程式開發組</span><span>2 / 3</span></div>
+    </div>
+  </section>
+
+  <section class="slide s3" aria-label="第 3 頁" data-density="MEDIUM" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>能力邊界</div>
+      <h2 class="title">條款引用可以交給模型，<span class="nb">手寫註記</span>和<span class="nb">新型態契約</span>還不行。</h2>
+      <div class="cols">
+        <div>
+          <div class="tag">已具備的能力</div>
+          <h3>跨頁的條款引用</h3>
+          <p>200 份測試樣本中，目前沒有發現條款引用錯誤。</p>
+          <div class="decide">處理方式：交給模型初步整理。</div>
+        </div>
+        <div>
+          <div class="tag hot">已發現的問題</div>
+          <div class="conf">推測，樣本仍不足</div>
+          <h3>手寫的修改註記</h3>
+          <p>掃描件上的手寫修改經常被漏掉，目前看到的案例還不夠多，無法確定比例。</p>
+          <div class="decide">處理方式：有手寫註記的文件，承辦人全文複核。</div>
+        </div>
+        <div>
+          <div class="tag">尚未驗證的風險</div>
+          <h3>新型態的契約</h3>
+          <p>還沒測過，一律交給人工。</p>
+        </div>
+      </div>
+      <div class="footer" data-chrome><span>程式開發組</span><span>3 / 3</span></div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

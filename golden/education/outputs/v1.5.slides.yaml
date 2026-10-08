@@ -1,0 +1,63 @@
+# 產生器依 DESIGN.md v1.5 第 1.3、1.4 節撰寫的 Slide Contract，對應 v1.5.html。
+slides:
+  - intent: 告訴聽眾從哪裡開始，以及這份簡報是給誰的
+    takeaway: 先從解釋舊程式碼和寫測試初稿開始
+    pattern: P01
+    density: LOW
+    energy: FOCUSED
+    motif: M-H
+    visual_rationale: 教育訓練的開場不需要衝擊感，以留白與一條分隔線降低距離感
+    evidence:
+      - claim: 120 位同仁中有 46 位在用
+        source: Q-01
+        calculation: 無
+        basis: 開發部門全體，自行填答
+        status: 已驗證
+
+  - intent: 先承認聽眾的擔心
+    takeaway: 還沒開始的人，多半卡在兩個擔心
+    pattern: P03
+    density: MEDIUM
+    energy: FOCUSED
+    motif: M-A
+    evidence:
+      - claim: 主要原因是不確定能輸入哪些資料、擔心產出有錯
+        source: Q-03
+        calculation: 無
+        basis: 74 位未使用者，可複選
+        status: 已驗證
+
+  - intent: 回答第一個擔心：資料
+    takeaway: 客戶資料、帳號、交易紀錄一律不輸入
+    pattern: P02
+    density: MEDIUM
+    energy: BOLD
+    motif: M-A
+    evidence: []
+
+  - intent: 回答第二個擔心：產出有錯，用同仁的實際經驗
+    takeaway: 它很會解釋舊程式碼，但也會解釋錯
+    pattern: P02
+    density: MEDIUM
+    energy: FOCUSED
+    motif: M-H
+    visual_rationale: 引言是同仁的原話，用一條直線框出，讓經驗本身成為焦點
+    evidence:
+      - claim: 同仁遇過它把欄位用途解釋錯
+        source: 一位同仁的經驗
+        calculation: 無
+        basis: 單一案例
+        status: 已驗證
+
+  - intent: 給出可以照做的開始方式
+    takeaway: 先挑低風險的工作，每次都自己確認
+    pattern: P15
+    density: HIGH
+    energy: FOCUSED
+    motif: M-B
+    evidence:
+      - claim: 寫測試初稿約省一半時間
+        source: Q-04
+        calculation: 無
+        basis: 使用者自評，沒有實際量測
+        status: 推測
