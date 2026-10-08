@@ -12,7 +12,8 @@ Deck markup convention:
 - Elements marked data-chrome (eyebrow, footer, nav; see 3.7) are not counted as content.
 
 It also scans the source for offline and theme problems (3.2, 3.5): external resources,
-prefers-color-scheme, and Ming or serif faces in font stacks.
+prefers-color-scheme, and Ming or serif faces in font stacks; and for the keyboard
+navigation runtime from templates/deck.html (3.7).
 
 Font sizes, overflow, safe margins and contrast need a rendered page and are reported as
 NOT CHECKED, so a PASS here is not a visual-quality verdict.
@@ -164,6 +165,8 @@ def check(deck_html, design, slide_max=None):
         issues.append(("deck", "ERROR", "3.5", "loads an external resource; the deck will break offline"))
     if COLOR_SCHEME_QUERY.search(source):
         issues.append(("deck", "WARNING", "3.5", "follows prefers-color-scheme; use a fixed light theme"))
+    if "data-deck-runtime" not in source:
+        issues.append(("deck", "WARNING", "3.7", "no deck runtime; copy it from templates/deck.html for keyboard navigation"))
     styles = " ".join(a or b for a, b in STYLE_BLOCK.findall(source))
     ming = sorted({m.group(0) for m in MING_OR_SERIF.finditer(styles)})
     if ming:

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>簡報標題</title>
+<!--
+  Eric Presentation Design System v1.6 HTML deck template.
+  - One self-contained file, no external resources, system fonts only (DESIGN.md 3.2, 3.5).
+  - Each slide is <section class="slide"> with data-density and data-energy (check_deck.py).
+  - Chrome (kicker, footer) carries data-chrome so it is not counted as content (3.7).
+  - Keys: → Space PageDown Enter next; ← Shift+Space PageUp previous; Home End; F fullscreen; O overview.
+  - Open with #overview to start in overview mode (used for screenshots); #3 opens slide 3.
+-->
+<style>
+  /* Fixed light theme and system fonts only (DESIGN.md 3.2, 3.5) */
+  :root {
+    color-scheme: light;
+    --paper: #F8F5EF;
+    --ink: #1F1D1A;
+    --muted: #5F584F;
+    --rule: #CFC6B8;
+    --fill: #ECE5D9;
+    --accent: #B5562F;
+    --accent-tint: #F6E7DE;
+    --ok-bg: #E2EDE5; --ok: #2F6B4A;
+    --warn-bg: #F5E6CB; --warn: #855610;
+    --unk-bg: #E9E4DC; --unk: #5F584F;
+    --sans: "Microsoft JhengHei", "微軟正黑體", "PingFang TC", "Noto Sans TC", sans-serif;
+    --mono: Consolas, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #E4DED3; color: var(--ink); font-family: var(--sans); padding: 32px 16px; }
+  .deck { max-width: 1200px; margin: 0 auto; display: grid; gap: 32px; }
+
+  /* 1920-wide design space, scaled with container units */
+  .slide { container-type: inline-size; position: relative; aspect-ratio: 16 / 9; background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); overflow: hidden; }
+  .frame { position: absolute; inset: 0; padding: 5.5% 6.5% 4.5%; display: grid; grid-template-rows: auto auto 1fr auto auto; }
+  .kicker { font-size: 1.1cqw; color: var(--muted); letter-spacing: .08em; font-weight: 700; }
+  .title { font-size: 3.1cqw; line-height: 1.3; margin: 1.2cqw 0 0; font-weight: 700; max-width: 80%; }
+  /* CT06: headings break at punctuation, not mid-word */
+  .title, h3 { word-break: keep-all; overflow-wrap: anywhere; }
+  .nb { white-space: nowrap; }
+  .viz { min-height: 0; display: flex; align-items: center; padding: 2cqw 0 1cqw; }
+  .viz > * { width: 100%; }
+  .viz svg { height: 100%; max-height: 100%; display: block; }
+  .note { font-size: 1.25cqw; color: var(--muted); line-height: 1.6; margin: 0 0 1.4cqw; }
+  .footer { display: flex; justify-content: space-between; font-size: 1cqw; color: var(--muted); }
+  svg text { font-family: var(--sans); }
+
+  /* Tables carry comparison better than prose (visualize-first) */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 1.55cqw; }
+  .tbl th { text-align: left; font-size: 1.15cqw; color: var(--muted); font-weight: 700; padding: 0 1.2cqw 1cqw; border-bottom: 2px solid var(--ink); }
+  .tbl td { padding: 1.5cqw 1.2cqw; border-bottom: 1px solid var(--rule); vertical-align: middle; line-height: 1.45; }
+  .tbl td:first-child { font-weight: 700; }
+  /* Confidence labels in words (3.11) */
+  .pill { display: inline-block; padding: .3cqw 1cqw; border-radius: 99px; font-size: 1.2cqw; font-weight: 700; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+  .pill.unk { background: var(--unk-bg); color: var(--unk); }
+
+  /* deck-runtime:start — presentation mode, overview mode, print. Keep in sync with the script below. */
+  html.present, html.present body { height: 100%; overflow: hidden; }
+  html.present body { padding: 0; background: #2B2926; }
+  html.present .deck { max-width: none; height: 100vh; display: flex; align-items: center; justify-content: center; }
+  html.present .slide { flex: none; width: min(100vw, calc(100vh * 16 / 9)); box-shadow: none; }
+  html.present .slide:not(.is-current) { display: none; }
+  @page { size: A4 landscape; margin: 0; }
+  @media print {
+    html, body { background: #fff !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+    .deck { display: block !important; max-width: none !important; height: auto !important; }
+    .slide { display: block !important; width: 297mm !important; margin: 21mm 0 0; box-shadow: none !important; break-after: page; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .slide:last-child { break-after: auto; }
+  }
+  /* deck-runtime:end */
+</style>
+</head>
+<body>
+<main class="deck">
+
+  <section class="slide" aria-label="第 1 頁" data-density="LOW" data-energy="BOLD">
+    <div class="frame" style="grid-template-rows: auto 1fr auto">
+      <div class="kicker" data-chrome>簡報名稱　章節</div>
+      <h1 class="title" style="align-self:center;font-size:4.2cqw">標題寫成結論，而不是主題名稱。</h1>
+      <div class="footer" data-chrome><span>單位</span><span>1 / 2</span></div>
+    </div>
+  </section>
+
+  <section class="slide" aria-label="第 2 頁" data-density="MEDIUM" data-energy="FOCUSED">
+    <div class="frame">
+      <div class="kicker" data-chrome>章節</div>
+      <h2 class="title">有結構的資訊，用表格或圖表當主角。</h2>
+      <div class="viz">
+        <table class="tbl">
+          <thead><tr><th>項目</th><th>狀態</th><th>依據</th></tr></thead>
+          <tbody>
+            <tr><td>範例項目一</td><td><span class="pill ok">已驗證</span></td><td>資料來源</td></tr>
+            <tr><td>範例項目二</td><td><span class="pill warn">推測</span></td><td>推論的根據</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">量測口徑或資料來源寫在這裡。</p>
+      <div class="footer" data-chrome><span>單位</span><span>2 / 2</span></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- deck-runtime v1: keyboard navigation, presentation and overview modes. Inline, no dependencies. -->
+<script data-deck-runtime="1">
+(function () {
+  var root = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  if (!slides.length) return;
+  var current = 0;
+
+  function slideFromHash() {
+    var n = parseInt(location.hash.slice(1), 10);
+    return n >= 1 && n <= slides.length ? n - 1 : current;
+  }
+  function setHash(value) {
+    try { history.replaceState(null, "", "#" + value); } catch (e) { /* opaque origins refuse; position is just not remembered */ }
+  }
+  function show(index) {
+    current = Math.max(0, Math.min(slides.length - 1, index));
+    var presenting = root.classList.contains("present");
+    slides.forEach(function (slide, i) {
+      slide.classList.toggle("is-current", i === current);
+      if (presenting && i !== current) slide.setAttribute("aria-hidden", "true");
+      else slide.removeAttribute("aria-hidden");
+    });
+    if (presenting) setHash(current + 1);
+  }
+  function setMode(presenting) {
+    root.classList.toggle("present", presenting);
+    show(current);
+    if (!presenting) {
+      setHash("overview");
+      slides[current].scrollIntoView({ block: "start" });
+    }
+  }
+  function toggleFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (root.requestFullscreen) root.requestFullscreen().catch(function () {});
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var key = e.key;
+    if (key === "f" || key === "F") { toggleFullscreen(); e.preventDefault(); return; }
+    if (key === "o" || key === "O") { setMode(!root.classList.contains("present")); e.preventDefault(); return; }
+    if (!root.classList.contains("present")) return;  // overview mode keeps normal scrolling
+    var next = key === "ArrowRight" || key === "ArrowDown" || key === "PageDown" || key === "Enter" || (key === " " && !e.shiftKey);
+    var prev = key === "ArrowLeft" || key === "ArrowUp" || key === "PageUp" || key === "Backspace" || (key === " " && e.shiftKey);
+    if (next) show(current + 1);
+    else if (prev) show(current - 1);
+    else if (key === "Home") show(0);
+    else if (key === "End") show(slides.length - 1);
+    else return;
+    e.preventDefault();
+  });
+  window.addEventListener("hashchange", function () {
+    if (root.classList.contains("present")) show(slideFromHash());
+  });
+
+  current = slideFromHash();
+  setMode(location.hash !== "#overview");
+})();
+</script>
+</body>
+</html>
